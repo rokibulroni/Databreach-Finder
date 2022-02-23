@@ -40,6 +40,8 @@ or,
 - Search Data
 - Saved Data
  
+ # Add More Database
+ - Edit makemyprivacy.py line 31
 
 # Contact
 - tawk.to/rialms
