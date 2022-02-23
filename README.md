@@ -1,6 +1,9 @@
 # dataleaks
 Search for leaking data over the surf and deepweb
 
+# Clone Git
+- git clone https://github.com/rialms/dataleaks.git
+
 # Creative Usages
 1. Detect a dump
 2. Dig anything
