@@ -25,6 +25,11 @@ Search for leaking data over the surf and deepweb
 18. Dig or find any breached data
 19. Tool is not limited, but only ur imagination
 
+# Interface
+# Working Examples
+<div align="center">
+    <img src="https://i.ibb.co/MBgtDMb/sss.png" width="400px"</img> 
+</div>
 
 
 # Install
