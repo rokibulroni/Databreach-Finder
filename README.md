@@ -28,7 +28,7 @@ Search for leaking data over the surf and deepweb
 # Interface
 # Working Examples
 <div align="center">
-    <img src="https://i.ibb.co/MBgtDMb/sss.png"</img> 
+    <img src="https://github.com/rialms/dataleaks/raw/main/sss.png</img> 
 </div>
 
 
