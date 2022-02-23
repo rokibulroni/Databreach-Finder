@@ -1,5 +1,5 @@
 #!/bin/bash
-python3 fuck.py
+python3 makemyprivacy.py
 ./url_writer.sh
 ./extractor.sh
 echo "";
