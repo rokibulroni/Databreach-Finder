@@ -1,4 +1,4 @@
-# dataleaks
+# Databreach Finder
 Search for leaking data over the surf and deepweb
 
 # Clone Git
