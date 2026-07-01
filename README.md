@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/rokibulroni/Databreach-Finder/main/sss.png" alt="Databreach Finder Logo" width="200" />
   <h1>🔍 Databreach Finder Pro</h1>
   
   <p><b>Next-Generation, Fully Automated OSINT Engine for Deep & Surface Web Leaks</b></p>
