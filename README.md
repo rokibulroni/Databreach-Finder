@@ -79,4 +79,4 @@ python3 databreach_finder.py --query "example.com" --extract emails --report htm
 This tool is built for **educational purposes and authorized security research only**. The author is not responsible for any misuse or illegal activities conducted with this tool. Do not use this tool to access or exploit data you do not own.
 
 ## 📞 Contact
-- [Author](https://tawk.to/rialms)
+- [Author](https://chat.rokibulroni.com)
