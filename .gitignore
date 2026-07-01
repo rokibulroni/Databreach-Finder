@@ -3,11 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
-
-# Virtual Environment
 venv/
- 
- 
+
 # IDE / Editor Files
 .vscode/
 .idea/
@@ -16,3 +13,13 @@ venv/
 
 # MacOS
 .DS_Store
+
+# Logs and Databases
+*.log
+*.db
+*.sqlite
+*.sqlite3
+
+# Professor OSINT specific
+download_results_*.txt
+config.json

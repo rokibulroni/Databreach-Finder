@@ -7,5 +7,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENTRYPOINT ["python", "databreach_finder.py"]
+ENTRYPOINT ["python", "professor_osint.py"]
 CMD ["-h"]

@@ -3,328 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Databreach Finder Pro - Documentation</title>
-    <meta name="description" content="Next-Generation, Fully Automated OSINT Engine for Deep & Surface Web Leaks">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <title>Professor OSINT | Enterprise Intelligence</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary: #3b82f6;
-            --primary-glow: rgba(59, 130, 246, 0.5);
-            --glass-bg: rgba(30, 41, 59, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            --bg-color: #050510;
+            --surface: rgba(15, 20, 30, 0.7);
+            --border: rgba(0, 255, 128, 0.2);
+            --primary: #00ff80;
+            --primary-glow: rgba(0, 255, 128, 0.5);
+            --secondary: #0088ff;
+            --text-main: #f0f0f0;
+            --text-dim: #a0a8b0;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
+            margin: 0;
+            padding: 0;
             line-height: 1.6;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        /* Animated Background Blobs */
-        .blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(100px);
-            z-index: -1;
-            opacity: 0.6;
-            animation: float 20s infinite alternate ease-in-out;
-        }
-        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #4338ca; }
-        .blob-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #0ea5e9; animation-delay: -10s; }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(100px, 50px) scale(1.2); }
+            background-image: 
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: center top;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 40px 20px;
         }
 
-        /* Glassmorphism Classes */
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-top: 40px;
         }
 
-        .glass:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-        }
-
-        /* Typography */
-        h1, h2, h3 {
+        h1 {
+            font-size: 3.5rem;
             font-weight: 800;
-            margin-bottom: 1rem;
-            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            margin: 0 0 15px 0;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px var(--primary-glow);
         }
 
-        h1 { font-size: 3.5rem; text-align: center; margin-bottom: 0.5rem; }
-        .subtitle { text-align: center; color: var(--text-muted); font-size: 1.2rem; margin-bottom: 3rem; }
-
-        h2 { font-size: 2rem; margin-top: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; }
-        h3 { font-size: 1.3rem; margin-top: 1.5rem; color: #e2e8f0; -webkit-text-fill-color: #e2e8f0; }
-
-        p { margin-bottom: 1rem; color: #cbd5e1; }
-
-        /* Features Grid */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .feature-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--glass-border);
-            padding: 1.5rem;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-        }
-        
-        .feature-card:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: var(--primary);
-        }
-
-        .feature-card h4 { font-size: 1.1rem; margin-bottom: 0.5rem; color: #f8fafc; display: flex; align-items: center; gap: 8px;}
-        .feature-card p { font-size: 0.9rem; color: var(--text-muted); margin: 0;}
-
-        /* Code Blocks */
-        pre {
-            background: #020617;
-            padding: 1.5rem;
-            border-radius: 8px;
-            overflow-x: auto;
-            border: 1px solid #1e293b;
-            margin: 1rem 0;
-            position: relative;
-        }
-        
-        code {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.9rem;
-            color: #38bdf8;
-        }
-
-        .code-comment { color: #64748b; }
-        .code-keyword { color: #f472b6; }
-        .code-string { color: #a3e635; }
-
-        /* Inline Code */
-        .inline-code {
-            background: #1e293b;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
-            color: #cbd5e1;
-        }
-
-        /* Buttons */
-        .btn-container {
+        .hero-buttons {
+            margin-top: 30px;
             display: flex;
             justify-content: center;
-            gap: 1rem;
-            margin-bottom: 3rem;
+            gap: 15px;
         }
 
         .btn {
             display: inline-block;
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
+            padding: 12px 28px;
+            border-radius: 8px;
             font-weight: 600;
             text-decoration: none;
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9rem;
+            cursor: pointer;
         }
 
         .btn-primary {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 0 20px var(--primary-glow);
+            background: rgba(0, 255, 128, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
         }
 
         .btn-primary:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
+            background: var(--primary);
+            color: var(--bg-color);
             box-shadow: 0 0 30px var(--primary-glow);
         }
 
-        .btn-secondary {
-            background: transparent;
-            color: var(--text-main);
-            border: 1px solid var(--glass-border);
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
         }
 
-        .btn-secondary:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateY(-2px);
+        .card {
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        /* Footer */
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 128, 0.15);
+            border-color: rgba(0, 255, 128, 0.5);
+        }
+
+        .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .card h3 {
+            margin: 0 0 15px 0;
+            color: white;
+            font-size: 1.4rem;
+        }
+
+        .card p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .cmd {
+            background: #000;
+            border: 1px solid #333;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            color: #ff9d00;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .terminal-block {
+            margin-top: 80px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .terminal-header {
+            background: #1a1a1a;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot:nth-child(1) { background: #ff5f56; }
+        .dot:nth-child(2) { background: #ffbd2e; }
+        .dot:nth-child(3) { background: #27c93f; }
+
+        .terminal-body {
+            padding: 30px;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .prompt { color: #fff; }
+        .comment { color: #666; }
+        
         footer {
             text-align: center;
-            margin-top: 4rem;
-            padding: 2rem 0;
-            color: var(--text-muted);
-            border-top: 1px solid var(--glass-border);
+            margin-top: 80px;
+            padding: 30px;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
         }
+        
         footer a {
             color: var(--primary);
             text-decoration: none;
         }
-        footer a:hover {
-            text-decoration: underline;
-        }
-
     </style>
 </head>
 <body>
 
-    <!-- Background Blobs -->
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
+<div class="container">
+    <header>
+        <h1>Professor OSINT</h1>
+        <p class="subtitle">The Ultimate Enterprise OSINT & Attack Surface Discovery Framework. Fast, Native, and 100% Dependency-Free.</p>
+        <div class="hero-buttons">
+            <a href="https://github.com/rokibulroni/professor-osint" class="btn btn-primary">View on GitHub</a>
+            <a href="#features" class="btn btn-primary" style="background:transparent; color:#fff; border-color:#555; box-shadow:none;">Explore Features</a>
+        </div>
+    </header>
 
-    <div class="container">
-        <!-- Hero Section -->
-        <header>
-            <h1>Databreach Finder Pro</h1>
-            <p class="subtitle">Next-Generation, Fully Automated OSINT Engine for Deep & Surface Web Leaks</p>
-            
-            <div class="btn-container">
-                <a href="https://github.com/rokibulroni/databreach-finder" class="btn btn-primary" target="_blank">View on GitHub</a>
-                <a href="#installation" class="btn btn-secondary">Get Started</a>
+    <div class="terminal-block">
+        <div class="terminal-header">
+            <div class="dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
             </div>
-        </header>
-
-        <!-- Features Section -->
-        <section class="glass">
-            <h2>✨ Enterprise Features</h2>
-            <p>Built for security researchers and penetration testers, Databreach Finder automates the discovery of highly sensitive leaked data.</p>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <h4>⚡ Asynchronous Engine</h4>
-                    <p>Powered by asyncio and aiohttp. Scrape and download dozens of URLs concurrently without CPU blocking.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>🗄️ SQLite Persistence</h4>
-                    <p>All findings are permanently stored in a local databreach.db with smart de-duplication to prevent alert fatigue.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>🐳 Dockerized</h4>
-                    <p>Spin up the tool and an isolated Tor proxy with a single docker-compose command.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>🕵️ Tor Anonymization</h4>
-                    <p>Use the --tor flag to route traffic through SOCKS5, preventing IP bans and staying hidden.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>🔔 Real-Time Webhooks</h4>
-                    <p>Get instant notifications on Discord or Telegram when target leaks are discovered.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>📊 HTML Reporting</h4>
-                    <p>Generate pristine, client-ready HTML reports detailing the exact source and snippet of the leak.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Installation Section -->
-        <section id="installation" class="glass">
-            <h2>🛠️ Installation</h2>
-            
-            <h3>Option 1: Docker (Recommended)</h3>
-            <p>The cleanest way to run the tool without polluting your local environment.</p>
-            <pre><code><span class="code-comment"># Clone the repository</span>
-<span class="code-keyword">git</span> clone https://github.com/rokibulroni/databreach-finder.git
-<span class="code-keyword">cd</span> databreach-finder
-
-<span class="code-comment"># Start the Tor Proxy in the background</span>
-<span class="code-keyword">docker-compose</span> up -d tor
-
-<span class="code-comment"># Run the Databreach Finder</span>
-<span class="code-keyword">docker-compose</span> run databreach-finder -q <span class="code-string">"target_company"</span> --extract emails --tor</code></pre>
-
-            <h3>Option 2: Native Python</h3>
-            <p>Ensure you have Python 3.11+ installed on your system.</p>
-            <pre><code><span class="code-keyword">git</span> clone https://github.com/rokibulroni/databreach-finder.git
-<span class="code-keyword">cd</span> databreach-finder
-
-<span class="code-comment"># Create and activate a virtual environment</span>
-<span class="code-keyword">python3</span> -m venv venv
-<span class="code-keyword">source</span> venv/bin/activate
-
-<span class="code-comment"># Install dependencies</span>
-<span class="code-keyword">pip</span> install -r requirements.txt</code></pre>
-        </section>
-
-        <!-- Usage Section -->
-        <section class="glass">
-            <h2>💻 Usage Guide</h2>
-            <p>The tool comes with a beautiful CLI interface. Here are some common ways to use it:</p>
-
-            <h3>1. Basic Search</h3>
-            <p>Hunt for a keyword and extract any lines containing it:</p>
-            <pre><code>python3 databreach_finder.py --query <span class="code-string">"example.com"</span></code></pre>
-
-            <h3>2. Targeted Regex Extraction</h3>
-            <p>Find specific data patterns related to your target using the <span class="inline-code">--extract</span> flag. Supported options: <span class="inline-code">emails</span>, <span class="inline-code">cards</span>, <span class="inline-code">ipv4</span>, <span class="inline-code">btc</span>, <span class="inline-code">eth</span>, <span class="inline-code">aws_key</span>, <span class="inline-code">jwt</span>, <span class="inline-code">rsa_private</span>.</p>
-            <pre><code>python3 databreach_finder.py --query <span class="code-string">"company dump"</span> --extract aws_key</code></pre>
-
-            <h3>3. Stealth Mode (Tor Routing)</h3>
-            <p>Route all your requests through the Tor network. <em>Requires Tor running locally on port 9050, or via Docker.</em></p>
-            <pre><code>python3 databreach_finder.py --query <span class="code-string">"target"</span> --extract btc --tor</code></pre>
-
-            <h3>4. Generate HTML Report</h3>
-            <p>Generate a professional HTML report alongside the text output for clients.</p>
-            <pre><code>python3 databreach_finder.py --query <span class="code-string">"example.com"</span> --extract emails --report html</code></pre>
-        </section>
-
-        <!-- Configuration Section -->
-        <section class="glass">
-            <h2>🧠 Advanced Configuration</h2>
-            <p>Databreach Finder Pro supports zero-code customization via a <span class="inline-code">config.json</span> file.</p>
-            <ol style="margin-left: 2rem; color: #cbd5e1;">
-                <li>Rename <span class="inline-code">config.json.example</span> to <span class="inline-code">config.json</span>.</li>
-                <li><strong>Add Custom Paste Sites:</strong> Append specific deep web or surface web URLs.</li>
-                <li><strong>Add Custom Regex Patterns:</strong> Hunt for your own proprietary keys.</li>
-                <li><strong>Configure Webhooks:</strong> Add your Discord Webhook URL or Telegram Bot Token for real-time alerting.</li>
-            </ol>
-        </section>
-
-        <footer>
-            <p>Made with ❤️ by <a href="https://chat.rokibulroni.com" target="_blank">Rokibul Roni</a></p>
-            <p style="font-size: 0.8rem; margin-top: 10px;">This tool is built for educational purposes and authorized security research ONLY.</p>
-        </footer>
+            <div style="margin: 0 auto; color: #888; font-family: sans-serif; font-size: 0.85rem;">professor_osint.py — bash</div>
+        </div>
+        <div class="terminal-body">
+            <span class="comment"># Clone and setup the framework</span><br>
+            <span class="prompt">$</span> git clone https://github.com/rokibulroni/professor-osint.git<br>
+            <span class="prompt">$</span> cd professor-osint && source venv/bin/activate<br>
+            <br>
+            <span class="comment"># Launch a comprehensive Enterprise-level scan</span><br>
+            <span class="prompt">$</span> python3 professor_osint.py --query "tesla.com" --spider --rustscan --workspace --report html<br>
+            <br>
+            Starting Enterprise Scan Engine... [OK]<br>
+            Mapping Attack Surface... [OK]<br>
+            Sweeping Active Ports... [OK]<br>
+            Generating Executive Report... [DONE]
+        </div>
     </div>
+
+    <h2 id="features" style="text-align:center; margin-top:100px; font-size:2.5rem; text-shadow: 0 0 20px var(--border);">Enterprise Modules</h2>
+
+    <div class="grid">
+        <div class="card">
+            <div class="icon">🕸️</div>
+            <h3>Attack Surface Mapping</h3>
+            <p>Passively resolve IPs and map out open ports, cloud hostnames, CDN tags, and known vulnerabilities (CVEs) without alerting the target.</p>
+            <div class="cmd">--query "example.com" --spider</div>
+        </div>
+
+        <div class="card">
+            <div class="icon">⚡</div>
+            <h3>Active Port Scanner</h3>
+            <p>Harness the power of asynchronous Python (asyncio) to actively sweep thousands of common ports in mere seconds.</p>
+            <div class="cmd">--query "scanme.nmap.org" --rustscan</div>
+        </div>
+
+        <div class="card">
+            <div class="icon">🌾</div>
+            <h3>Domain Intelligence</h3>
+            <p>Instantly enumerate subdomains and exposed corporate emails through certificate transparency logs and search scraping.</p>
+            <div class="cmd">--query "example.com" --harvester</div>
+        </div>
+
+        <div class="card">
+            <div class="icon">💼</div>
+            <h3>Workspace Intelligence</h3>
+            <p>Hunt for sensitive documents exposed in Google Drive, Docs, Trello boards, and Notion workspaces associated with the target.</p>
+            <div class="cmd">--query "company" --workspace</div>
+        </div>
+
+        <div class="card">
+            <div class="icon">👤</div>
+            <h3>Social Recon & Dossier</h3>
+            <p>Map a target's digital footprint across platforms and generate detailed dossiers including bios, real names, and profile pictures.</p>
+            <div class="cmd">--username "target" --analyzer --dossier</div>
+        </div>
+        
+        <div class="card">
+            <div class="icon">📞</div>
+            <h3>Telecom Intelligence</h3>
+            <p>Perform carrier, regional, and time-zone lookups on international phone numbers, coupled with automated footprint dorking.</p>
+            <div class="cmd">--query "+1234567890" --phone</div>
+        </div>
+
+        <div class="card">
+            <div class="icon">⭐</div>
+            <h3>Resource Discovery</h3>
+            <p>Dynamically query GitHub's public APIs to instantly discover the top-rated open-source hacking tools for any specific vulnerability.</p>
+            <div class="cmd">--query "phishing" --awesome</div>
+        </div>
+
+        <div class="card">
+            <div class="icon">🧰</div>
+            <h3>The Professor's Toolbox</h3>
+            <p>Access a built-in interactive encyclopedia of curated hacking tools, complete with exact terminal installation commands.</p>
+            <div class="cmd">--query "wireless" --toolbox</div>
+        </div>
+
+        <div class="card">
+            <div class="icon">💻</div>
+            <h3>Terminal Playbook</h3>
+            <p>Dynamically inject ready-to-run terminal commands directly into your CLI based on your target's infrastructure.</p>
+            <div class="cmd">--query "target.com" --webcheck --playbook</div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Built with ❤️ by <b>Rokibul Roni</b></p>
+        <p><a href="https://osint.rokibulroni.com">osint.rokibulroni.com</a> | <a href="https://github.com/rokibulroni/professor-osint">GitHub Repository</a></p>
+    </footer>
+</div>
 
 </body>
 </html>

@@ -1,0 +1,15 @@
+{
+    "BleepingComputer": "https://www.bleepingcomputer.com/feed/",
+    "TheHackerNews": "https://feeds.feedburner.com/TheHackersNews",
+    "CyberScoop": "https://www.cyberscoop.com/feed/",
+    "KrebsOnSecurity": "https://krebsonsecurity.com/feed/",
+    "DarkReading": "https://www.darkreading.com/rss.xml",
+    "SecurityWeek": "https://www.securityweek.com/feed/",
+    "Threatpost": "https://threatpost.com/feed/",
+    "Wired Security": "https://www.wired.com/feed/category/security/latest/rss",
+    "TechCrunch Security": "https://techcrunch.com/category/security/feed/",
+    "HackerNoon": "https://hackernoon.com/feed",
+    "ZDNet Security": "https://www.zdnet.com/topic/security/rss.xml",
+    "Google News (Cybersecurity)": "https://news.google.com/rss/search?q=cybersecurity&hl=en-US&gl=US&ceid=US:en",
+    "CISA Alerts": "https://www.cisa.gov/uscert/ncas/alerts.xml"
+}

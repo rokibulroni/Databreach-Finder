@@ -7,10 +7,10 @@ services:
       - "9050:9050"
     restart: always
 
-  databreach-finder:
+  professor-osint:
     build: .
     volumes:
       - .:/app
     depends_on:
       - tor
-    # Example usage: docker-compose run databreach-finder -q "example.com" --tor
+    # Example usage: docker-compose run professor-osint -q "example.com" --tor
