@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Databreach Finder Pro - Documentation</title>
+    <meta name="description" content="Next-Generation, Fully Automated OSINT Engine for Deep & Surface Web Leaks">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Blobs */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #4338ca; }
+        .blob-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #0ea5e9; animation-delay: -10s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 50px) scale(1.2); }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Glassmorphism Classes */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h1 { font-size: 3.5rem; text-align: center; margin-bottom: 0.5rem; }
+        .subtitle { text-align: center; color: var(--text-muted); font-size: 1.2rem; margin-bottom: 3rem; }
+
+        h2 { font-size: 2rem; margin-top: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; }
+        h3 { font-size: 1.3rem; margin-top: 1.5rem; color: #e2e8f0; -webkit-text-fill-color: #e2e8f0; }
+
+        p { margin-bottom: 1rem; color: #cbd5e1; }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--primary);
+        }
+
+        .feature-card h4 { font-size: 1.1rem; margin-bottom: 0.5rem; color: #f8fafc; display: flex; align-items: center; gap: 8px;}
+        .feature-card p { font-size: 0.9rem; color: var(--text-muted); margin: 0;}
+
+        /* Code Blocks */
+        pre {
+            background: #020617;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #1e293b;
+            margin: 1rem 0;
+            position: relative;
+        }
+        
+        code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #38bdf8;
+        }
+
+        .code-comment { color: #64748b; }
+        .code-keyword { color: #f472b6; }
+        .code-string { color: #a3e635; }
+
+        /* Inline Code */
+        .inline-code {
+            background: #1e293b;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+        }
+
+        /* Buttons */
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px var(--primary-glow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 2rem 0;
+            color: var(--text-muted);
+            border-top: 1px solid var(--glass-border);
+        }
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <header>
+            <h1>Databreach Finder Pro</h1>
+            <p class="subtitle">Next-Generation, Fully Automated OSINT Engine for Deep & Surface Web Leaks</p>
+            
+            <div class="btn-container">
+                <a href="https://github.com/rokibulroni/Databreach-Finder" class="btn btn-primary" target="_blank">View on GitHub</a>
+                <a href="#installation" class="btn btn-secondary">Get Started</a>
+            </div>
+        </header>
+
+        <!-- Features Section -->
+        <section class="glass">
+            <h2>✨ Enterprise Features</h2>
+            <p>Built for security researchers and penetration testers, Databreach Finder automates the discovery of highly sensitive leaked data.</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h4>⚡ Asynchronous Engine</h4>
+                    <p>Powered by asyncio and aiohttp. Scrape and download dozens of URLs concurrently without CPU blocking.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🗄️ SQLite Persistence</h4>
+                    <p>All findings are permanently stored in a local databreach.db with smart de-duplication to prevent alert fatigue.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🐳 Dockerized</h4>
+                    <p>Spin up the tool and an isolated Tor proxy with a single docker-compose command.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🕵️ Tor Anonymization</h4>
+                    <p>Use the --tor flag to route traffic through SOCKS5, preventing IP bans and staying hidden.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🔔 Real-Time Webhooks</h4>
+                    <p>Get instant notifications on Discord or Telegram when target leaks are discovered.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📊 HTML Reporting</h4>
+                    <p>Generate pristine, client-ready HTML reports detailing the exact source and snippet of the leak.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation Section -->
+        <section id="installation" class="glass">
+            <h2>🛠️ Installation</h2>
+            
+            <h3>Option 1: Docker (Recommended)</h3>
+            <p>The cleanest way to run the tool without polluting your local environment.</p>
+            <pre><code><span class="code-comment"># Clone the repository</span>
+<span class="code-keyword">git</span> clone https://github.com/rokibulroni/Databreach-Finder.git
+<span class="code-keyword">cd</span> Databreach-Finder
+
+<span class="code-comment"># Start the Tor Proxy in the background</span>
+<span class="code-keyword">docker-compose</span> up -d tor
+
+<span class="code-comment"># Run the Databreach Finder</span>
+<span class="code-keyword">docker-compose</span> run databreach-finder -q <span class="code-string">"target_company"</span> --extract emails --tor</code></pre>
+
+            <h3>Option 2: Native Python</h3>
+            <p>Ensure you have Python 3.11+ installed on your system.</p>
+            <pre><code><span class="code-keyword">git</span> clone https://github.com/rokibulroni/Databreach-Finder.git
+<span class="code-keyword">cd</span> Databreach-Finder
+
+<span class="code-comment"># Create and activate a virtual environment</span>
+<span class="code-keyword">python3</span> -m venv venv
+<span class="code-keyword">source</span> venv/bin/activate
+
+<span class="code-comment"># Install dependencies</span>
+<span class="code-keyword">pip</span> install -r requirements.txt</code></pre>
+        </section>
+
+        <!-- Usage Section -->
+        <section class="glass">
+            <h2>💻 Usage Guide</h2>
+            <p>The tool comes with a beautiful CLI interface. Here are some common ways to use it:</p>
+
+            <h3>1. Basic Search</h3>
+            <p>Hunt for a keyword and extract any lines containing it:</p>
+            <pre><code>python3 databreach_finder.py --query <span class="code-string">"example.com"</span></code></pre>
+
+            <h3>2. Targeted Regex Extraction</h3>
+            <p>Find specific data patterns related to your target using the <span class="inline-code">--extract</span> flag. Supported options: <span class="inline-code">emails</span>, <span class="inline-code">cards</span>, <span class="inline-code">ipv4</span>, <span class="inline-code">btc</span>, <span class="inline-code">eth</span>, <span class="inline-code">aws_key</span>, <span class="inline-code">jwt</span>, <span class="inline-code">rsa_private</span>.</p>
+            <pre><code>python3 databreach_finder.py --query <span class="code-string">"company dump"</span> --extract aws_key</code></pre>
+
+            <h3>3. Stealth Mode (Tor Routing)</h3>
+            <p>Route all your requests through the Tor network. <em>Requires Tor running locally on port 9050, or via Docker.</em></p>
+            <pre><code>python3 databreach_finder.py --query <span class="code-string">"target"</span> --extract btc --tor</code></pre>
+
+            <h3>4. Generate HTML Report</h3>
+            <p>Generate a professional HTML report alongside the text output for clients.</p>
+            <pre><code>python3 databreach_finder.py --query <span class="code-string">"example.com"</span> --extract emails --report html</code></pre>
+        </section>
+
+        <!-- Configuration Section -->
+        <section class="glass">
+            <h2>🧠 Advanced Configuration</h2>
+            <p>Databreach Finder Pro supports zero-code customization via a <span class="inline-code">config.json</span> file.</p>
+            <ol style="margin-left: 2rem; color: #cbd5e1;">
+                <li>Rename <span class="inline-code">config.json.example</span> to <span class="inline-code">config.json</span>.</li>
+                <li><strong>Add Custom Paste Sites:</strong> Append specific deep web or surface web URLs.</li>
+                <li><strong>Add Custom Regex Patterns:</strong> Hunt for your own proprietary keys.</li>
+                <li><strong>Configure Webhooks:</strong> Add your Discord Webhook URL or Telegram Bot Token for real-time alerting.</li>
+            </ol>
+        </section>
+
+        <footer>
+            <p>Made with ❤️ by <a href="https://chat.rokibulroni.com" target="_blank">Rokibul Roni</a></p>
+            <p style="font-size: 0.8rem; margin-top: 10px;">This tool is built for educational purposes and authorized security research ONLY.</p>
+        </footer>
+    </div>
+
+</body>
+</html>

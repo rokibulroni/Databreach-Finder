@@ -121,7 +121,7 @@ class DatabreachFinder:
         return {}
 
     def print_banner(self):
-        banner = "[bold cyan]🔍 Databreach Finder Pro [Enterprise][/bold cyan]\n[bold green]Author:[/bold green] Elliot (Updated version)\n[bold green]Version:[/bold green] 4.0 (Async + DB)"
+        banner = "[bold cyan]🔍 Databreach Finder Pro [Enterprise][/bold cyan]\n[bold green]Author:[/bold green] Rokibul Roni\n[bold green]Version:[/bold green] 4.0 (Async + DB)"
         if self.use_tor:
             banner += "\n[bold magenta]🛡️ Tor Mode:[/bold magenta] ACTIVE"
         console.print(Panel(banner, expand=False))
