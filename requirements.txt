@@ -2,3 +2,5 @@ requests
 requests[socks]
 googlesearch-python
 rich
+aiohttp
+aiohttp-socks

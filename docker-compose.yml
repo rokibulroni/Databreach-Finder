@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  tor:
+    image: dperson/torproxy
+    ports:
+      - "9050:9050"
+    restart: always
+
+  databreach-finder:
+    build: .
+    volumes:
+      - .:/app
+    depends_on:
+      - tor
+    # Example usage: docker-compose run databreach-finder -q "example.com" --tor

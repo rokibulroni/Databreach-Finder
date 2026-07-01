@@ -5,20 +5,32 @@ import argparse
 import requests
 import random
 import datetime
+import sqlite3
+import logging
+import asyncio
+import aiohttp
 from urllib.error import HTTPError
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from googlesearch import search
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 from rich.table import Table
+from aiohttp_socks import ProxyConnector
 
 console = Console()
+
+# Configure Logging
+logging.basicConfig(
+    filename='databreach_app.log',
+    filemode='a',
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
 # Predefined Regex Patterns for extraction
 PATTERNS = {
     'emails': r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+',
-    'cards': r'\b(?:\d[ -]*?){13,16}\b', # basic credit card matching
+    'cards': r'\b(?:\d[ -]*?){13,16}\b', 
     'ipv4': r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b',
     'btc': r'\b(?:bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}\b',
     'eth': r'\b0x[a-fA-F0-9]{40}\b',
@@ -32,6 +44,13 @@ DEFAULT_PASTE_SITES = [
     'hastebin.com', 'ideone.com', 'pastebin.com', 'gist.github.com',
     'heypasteit.com', 'ivpaste.com', 'mysticpaste.com', 'paste.org.ru', 
     'paste2.org', 'sebsauvage.net', 'squadedit.com', 'wklej.se', 'textsnip.com'
+]
+
+USER_AGENTS = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36'
 ]
 
 class DatabreachFinder:
@@ -53,36 +72,56 @@ class DatabreachFinder:
         if 'custom_regex' in self.config:
             PATTERNS.update(self.config['custom_regex'])
             
-        self.session = requests.Session()
-        user_agents = [
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0',
-            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36'
-        ]
-        self.session.headers.update({
-            'User-Agent': random.choice(user_agents)
-        })
-        
-        # Configure Tor Proxy if requested
-        if self.use_tor:
-            console.print("[bold yellow][!] Configuring Tor Network Routing (SOCKS5)...[/bold yellow]")
-            self.session.proxies = {
-                'http': 'socks5h://127.0.0.1:9050',
-                'https': 'socks5h://127.0.0.1:9050'
-            }
+        # Init Database
+        self.init_db()
+
+    def init_db(self):
+        try:
+            self.conn = sqlite3.connect('databreach.db', check_same_thread=False)
+            self.cursor = self.conn.cursor()
+            self.cursor.execute('''
+                CREATE TABLE IF NOT EXISTS findings (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    query TEXT,
+                    url TEXT,
+                    extracted_data TEXT,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(query, url, extracted_data)
+                )
+            ''')
+            self.conn.commit()
+            logging.info("Database initialized successfully.")
+        except Exception as e:
+            logging.error(f"Database initialization failed: {e}")
+
+    def is_duplicate(self, url, data):
+        self.cursor.execute('SELECT 1 FROM findings WHERE query = ? AND url = ? AND extracted_data = ?', (self.query, url, data))
+        return self.cursor.fetchone() is not None
+
+    def save_to_db(self, url, data):
+        try:
+            self.cursor.execute('INSERT INTO findings (query, url, extracted_data) VALUES (?, ?, ?)', (self.query, url, data))
+            self.conn.commit()
+            return True
+        except sqlite3.IntegrityError:
+            return False # Duplicate ignored by DB constraints
+        except Exception as e:
+            logging.error(f"Error saving to DB: {e}")
+            return False
 
     def load_config(self, config_path):
         if os.path.exists(config_path):
             try:
                 with open(config_path, 'r') as f:
+                    logging.info(f"Loaded config from {config_path}")
                     return json.load(f)
             except Exception as e:
+                logging.error(f"Error loading config.json: {e}")
                 console.print(f"[bold red][!] Error loading config.json: {e}[/bold red]")
         return {}
 
     def print_banner(self):
-        banner = "[bold cyan]🔍 Databreach Finder Pro [Enterprise][/bold cyan]\n[bold green]Author:[/bold green] Elliot (Updated version)\n[bold green]Version:[/bold green] 3.0"
+        banner = "[bold cyan]🔍 Databreach Finder Pro [Enterprise][/bold cyan]\n[bold green]Author:[/bold green] Elliot (Updated version)\n[bold green]Version:[/bold green] 4.0 (Async + DB)"
         if self.use_tor:
             banner += "\n[bold magenta]🛡️ Tor Mode:[/bold magenta] ACTIVE"
         console.print(Panel(banner, expand=False))
@@ -97,16 +136,18 @@ class DatabreachFinder:
             try:
                 data = {"content": f"**{title}**\n```\n{message}\n```"}
                 requests.post(discord_webhook, json=data)
-            except Exception:
-                pass
+                logging.info("Sent Discord Webhook")
+            except Exception as e:
+                logging.error(f"Discord webhook failed: {e}")
                 
         if telegram_token and telegram_chat_id and "YOUR_" not in telegram_token:
             try:
                 url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
                 data = {"chat_id": telegram_chat_id, "text": f"{title}\n{message}"}
                 requests.post(url, json=data)
-            except Exception:
-                pass
+                logging.info("Sent Telegram Alert")
+            except Exception as e:
+                logging.error(f"Telegram alert failed: {e}")
 
     def dork_search(self):
         with console.status(f"[bold yellow]Searching Google for '{self.query}' on Paste Sites...[/bold yellow]", spinner="dots"):
@@ -117,46 +158,67 @@ class DatabreachFinder:
                 for url in search(advanced_query, num_results=30, lang="en"):
                     if url not in self.urls:
                         self.urls.append(url)
+                logging.info(f"Found {len(self.urls)} URLs via Google Dorking.")
             except HTTPError as e:
                 if e.code == 429:
-                    console.print(f"[bold red][!] Google Rate Limit Hit (429). Please use --tor or try again later.[/bold red]")
+                    msg = "Google Rate Limit Hit (429). Please use --tor or try again later."
+                    console.print(f"[bold red][!] {msg}[/bold red]")
+                    logging.warning(msg)
                 else:
                     console.print(f"[bold red][!] Google Search Error: {e}[/bold red]")
+                    logging.error(f"Google Search HTTP Error: {e}")
             except Exception as e:
                 console.print(f"[bold red][!] Google Search Error: {e}[/bold red]")
+                logging.error(f"Google Search Exception: {e}")
 
         if self.urls:
             console.print(f"[bold green][+] Found {len(self.urls)} potential dumps![/bold green]")
         else:
             console.print("[bold red][-] No dumps found. Try a different query.[/bold red]")
 
-    def fetch_and_extract(self, url):
+    async def fetch_and_extract(self, session, url, progress, task):
         try:
             if 'pastebin.com' in url and '/raw/' not in url:
                 url = url.replace('pastebin.com/', 'pastebin.com/raw/')
                 
-            response = self.session.get(url, timeout=10)
-            if response.status_code == 200:
-                text = response.text
-                extracted_data = []
-                
-                if self.extract_type and self.extract_type in PATTERNS:
-                    matches = re.findall(PATTERNS[self.extract_type], text)
-                    extracted_data = list(set(matches))
-                else:
-                    lines = text.split('\n')
-                    for line in lines:
-                        if self.query.lower() in line.lower():
-                            extracted_data.append(line.strip()[:200]) # Cap line length
-                
-                return url, extracted_data
-            return url, []
-        except Exception:
-            return url, []
+            headers = {'User-Agent': random.choice(USER_AGENTS)}
+            async with session.get(url, headers=headers, timeout=10) as response:
+                if response.status == 200:
+                    text = await response.text()
+                    extracted_data = []
+                    
+                    if self.extract_type and self.extract_type in PATTERNS:
+                        matches = re.findall(PATTERNS[self.extract_type], text)
+                        extracted_data = list(set(matches))
+                    else:
+                        lines = text.split('\n')
+                        for line in lines:
+                            if self.query.lower() in line.lower():
+                                extracted_data.append(line.strip()[:200]) # Cap line length
+                    
+                    # De-duplication and Saving
+                    new_data = []
+                    for data in extracted_data:
+                        if not self.is_duplicate(url, data):
+                            self.save_to_db(url, data)
+                            new_data.append(data)
+                    
+                    if new_data:
+                        self.results.append({'url': url, 'data': new_data})
+                        
+        except Exception as e:
+            logging.debug(f"Failed to fetch {url}: {e}")
+        finally:
+            progress.advance(task)
 
-    def process_urls(self):
+    async def process_urls_async(self):
         if not self.urls:
             return
+
+        connector = None
+        if self.use_tor:
+            console.print("[bold yellow][!] Configuring Tor Network Routing (SOCKS5)...[/bold yellow]")
+            connector = ProxyConnector.from_url('socks5://127.0.0.1:9050')
 
         with Progress(
             SpinnerColumn(),
@@ -167,13 +229,9 @@ class DatabreachFinder:
         ) as progress:
             task = progress.add_task("[cyan]Downloading & Extracting...", total=len(self.urls))
             
-            with ThreadPoolExecutor(max_workers=self.threads) as executor:
-                future_to_url = {executor.submit(self.fetch_and_extract, url): url for url in self.urls}
-                for future in as_completed(future_to_url):
-                    url, data = future.result()
-                    if data:
-                        self.results.append({'url': url, 'data': data})
-                    progress.advance(task)
+            async with aiohttp.ClientSession(connector=connector) as session:
+                tasks = [self.fetch_and_extract(session, url, progress, task) for url in self.urls]
+                await asyncio.gather(*tasks)
 
     def generate_html_report(self):
         html_content = f"""
@@ -201,7 +259,7 @@ class DatabreachFinder:
             <table>
                 <tr>
                     <th>Source URL</th>
-                    <th>Extracted Data Snippet</th>
+                    <th>Extracted Data Snippet (New Unique Findings)</th>
                 </tr>
         """
         for res in self.results:
@@ -220,13 +278,14 @@ class DatabreachFinder:
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(html_content)
         console.print(f"[bold green][+] Professional HTML report saved to {filename}[/bold green]")
+        logging.info(f"Report generated: {filename}")
 
     def display_results(self):
         if not self.results:
-            console.print("[bold red]No matching data found in the downloaded dumps.[/bold red]")
+            console.print("[bold red]No matching unique data found in the downloaded dumps.[/bold red]")
             return
 
-        table = Table(title="Extraction Results", show_lines=True)
+        table = Table(title="Extraction Results (Unique)", show_lines=True)
         table.add_column("Source URL", style="cyan", no_wrap=True)
         table.add_column(f"Extracted Data ({self.extract_type or 'Raw'})", style="magenta")
 
@@ -238,10 +297,10 @@ class DatabreachFinder:
                 data_str += f"\n... and {len(res['data']) - 10} more"
             total_extracted += len(res['data'])
             table.add_row(res['url'], data_str)
-            alert_message += f"Found in {res['url']} -> {len(res['data'])} items\n"
+            alert_message += f"Found in {res['url']} -> {len(res['data'])} new items\n"
 
         console.print(table)
-        console.print(f"[bold green][+] Total extracted items: {total_extracted}[/bold green]")
+        console.print(f"[bold green][+] Total UNIQUE extracted items: {total_extracted}[/bold green]")
 
         # Send Real-Time Alert
         if alert_message:
@@ -256,6 +315,7 @@ class DatabreachFinder:
                     f.write(f"{item}\n")
                 f.write("-" * 50 + "\n")
         console.print(f"[bold green][+] Full results saved to {txt_filename}[/bold green]")
+        logging.info(f"Results saved to {txt_filename}")
 
         # Save to HTML if requested
         if self.report_format == 'html':
@@ -266,7 +326,7 @@ def main():
     parser = argparse.ArgumentParser(description="Databreach Finder Pro [Enterprise]")
     parser.add_argument("-q", "--query", required=True, help="Target search keyword/query")
     parser.add_argument("-e", "--extract", choices=list(PATTERNS.keys()), help="Specific data pattern to extract from dumps")
-    parser.add_argument("-t", "--threads", type=int, default=10, help="Number of concurrent threads (default: 10)")
+    parser.add_argument("-t", "--threads", type=int, default=10, help="Number of concurrent connections (default: 10)")
     parser.add_argument("--tor", action="store_true", help="Route traffic through local Tor SOCKS5 proxy (127.0.0.1:9050)")
     parser.add_argument("--report", choices=['html'], help="Generate a professional HTML report")
     parser.add_argument("-c", "--config", default="config.json", help="Path to custom config file (default: config.json)")
@@ -283,7 +343,7 @@ def main():
     )
     finder.print_banner()
     finder.dork_search()
-    finder.process_urls()
+    asyncio.run(finder.process_urls_async())
     finder.display_results()
 
 if __name__ == "__main__":

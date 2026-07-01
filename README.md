@@ -6,30 +6,37 @@
 ## 📖 Overview
 Databreach Finder Pro is an enterprise-grade automation tool designed for security researchers and penetration testers. It automates the process of finding, downloading, and extracting leaked sensitive data from various paste sites using Google Dorking.
 
-## 🚀 Enterprise Features
-- **All-in-One Python Tool:** Cross-platform support without any bash dependencies.
-- **Advanced Regex Extraction:** Built-in pattern recognition for:
-  - `emails`, `cards` (Credit Cards), `ipv4`
-  - `btc` (Bitcoin Wallets), `eth` (Ethereum Wallets)
-  - `aws_key` (Amazon AWS API Keys)
-  - `jwt` (JSON Web Tokens)
-  - `rsa_private` (RSA Private Keys)
-- **Tor Network Routing:** Use the `--tor` flag to route all scraper traffic through the Tor network (prevents IP bans and allows anonymous scraping).
-- **Custom Configuration:** Use `config.json` to add custom paste sites, your own Regex patterns, and webhook keys.
+## 🚀 Enterprise Features (v4.0 Async Edition)
+- **Asynchronous Engine:** Built with `aiohttp` and `asyncio` for lightning-fast, non-blocking concurrent downloads.
+- **Persistent Database:** Integrates `SQLite` to persistently store and track all findings (`databreach.db`).
+- **Smart De-duplication:** Automatically filters out duplicate records across multiple scans, ensuring only *new* leaks trigger alerts.
+- **Dockerized:** Includes a `Dockerfile` and `docker-compose.yml` for isolated execution with a built-in Tor proxy.
+- **Advanced Logging:** Background processes and errors are logged to `databreach_app.log` for production debugging.
+- **CI/CD Pipeline:** Includes GitHub Actions workflows for automated testing and linting.
+- **Advanced Regex Extraction:** Built-in pattern recognition for `emails`, `cards`, `btc`, `eth`, `aws_key`, `jwt`, `rsa_private`.
+- **Tor Network Routing:** Use the `--tor` flag to route all scraper traffic through the Tor network.
 - **Real-Time Alerts:** Get notified instantly on **Discord** or **Telegram** when leaked data is found.
-- **Professional Reporting:** Generate clean HTML reports (`--report html`) to present findings to clients or teams.
+- **Professional Reporting:** Generate clean HTML reports (`--report html`).
 
 ## 🛠️ Prerequisites
-- Python 3.x
-- `pip` package manager
-- Tor Service (Optional, but required if you want to use the `--tor` flag)
+- Python 3.x OR Docker
+- Tor Service (Optional, but required if you want to use the `--tor` flag locally without Docker)
 
 ## ⚙️ Installation
+
+### Option 1: Native Installation
 Clone the repository and install the dependencies:
 ```bash
 git clone https://github.com/rialms/dataleaks.git
 cd dataleaks
 pip install -r requirements.txt
+```
+
+### Option 2: Docker (Recommended)
+You can run the tool in an isolated container along with a Tor proxy service using Docker Compose:
+```bash
+docker-compose up -d tor
+docker-compose run databreach-finder -q "target" --extract emails --tor
 ```
 
 ### Configuration (Optional)
