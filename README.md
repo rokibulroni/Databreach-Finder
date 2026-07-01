@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/rokibulroni/professor-osint/main/docs/posint.png" width="150" alt="Professor OSINT Logo">
+  <img src="https://raw.githubusercontent.com/rokibulroni/professor-osint/main/docs/posint.png" alt="Professor OSINT Logo">
   <h1>Professor OSINT</h1>
   <p><b>The Ultimate Enterprise OSINT & Attack Surface Discovery Framework</b></p>
 
