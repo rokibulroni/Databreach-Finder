@@ -1,2 +1,4 @@
 requests
-google
+requests[socks]
+googlesearch-python
+rich
