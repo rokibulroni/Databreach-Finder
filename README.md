@@ -113,5 +113,5 @@ python3 professor_osint.py --query "target@gmail.com" --workspace --monitor --we
 Distributed under the MIT License. See `LICENSE` for more information.
 
 <div align="center">
-  <sub>Built with ❤️ by <b>Rokibul Roni</b> | <a href="https://osint.rokibulroni.com">osint.rokibulroni.com</a></sub>
+  <sub>Built with ❤️ by <b>Rokibul Roni</b> | <a href="https://posint.rokibulroni.com">posint.rokibulroni.com</a></sub>
 </div>
