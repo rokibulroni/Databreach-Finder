@@ -3,7 +3,9 @@ import re
 import json
 import argparse
 import requests
+import random
 import datetime
+from urllib.error import HTTPError
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from googlesearch import search
 from rich.console import Console
@@ -41,6 +43,7 @@ class DatabreachFinder:
         self.report_format = report_format
         self.urls = []
         self.results = []
+        self.timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         
         # Load Configuration
         self.config = self.load_config(config_path)
@@ -51,8 +54,14 @@ class DatabreachFinder:
             PATTERNS.update(self.config['custom_regex'])
             
         self.session = requests.Session()
+        user_agents = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0',
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36'
+        ]
         self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'User-Agent': random.choice(user_agents)
         })
         
         # Configure Tor Proxy if requested
@@ -108,6 +117,11 @@ class DatabreachFinder:
                 for url in search(advanced_query, num_results=30, lang="en"):
                     if url not in self.urls:
                         self.urls.append(url)
+            except HTTPError as e:
+                if e.code == 429:
+                    console.print(f"[bold red][!] Google Rate Limit Hit (429). Please use --tor or try again later.[/bold red]")
+                else:
+                    console.print(f"[bold red][!] Google Search Error: {e}[/bold red]")
             except Exception as e:
                 console.print(f"[bold red][!] Google Search Error: {e}[/bold red]")
 
@@ -202,9 +216,10 @@ class DatabreachFinder:
         </html>
         """
         
-        with open('report.html', 'w', encoding='utf-8') as f:
+        filename = f'report_{self.timestamp}.html'
+        with open(filename, 'w', encoding='utf-8') as f:
             f.write(html_content)
-        console.print("[bold green][+] Professional HTML report saved to report.html[/bold green]")
+        console.print(f"[bold green][+] Professional HTML report saved to {filename}[/bold green]")
 
     def display_results(self):
         if not self.results:
@@ -233,13 +248,14 @@ class DatabreachFinder:
             self.send_alert(f"Databreach Finder Alert: {self.query}", alert_message)
 
         # Save to TXT
-        with open('download_results.txt', 'w', encoding='utf-8') as f:
+        txt_filename = f'download_results_{self.timestamp}.txt'
+        with open(txt_filename, 'w', encoding='utf-8') as f:
             for res in self.results:
                 f.write(f"URL: {res['url']}\n")
                 for item in res['data']:
                     f.write(f"{item}\n")
                 f.write("-" * 50 + "\n")
-        console.print("[bold green][+] Full results saved to download_results.txt[/bold green]")
+        console.print(f"[bold green][+] Full results saved to {txt_filename}[/bold green]")
 
         # Save to HTML if requested
         if self.report_format == 'html':
