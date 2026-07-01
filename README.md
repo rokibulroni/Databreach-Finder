@@ -3,12 +3,20 @@
   <h1>Professor OSINT</h1>
   <p><b>The Ultimate Enterprise OSINT & Attack Surface Discovery Framework</b></p>
 
-  <p>
-    <a href="https://github.com/rokibulroni/professor-osint/releases"><img src="https://img.shields.io/github/v/release/rokibulroni/professor-osint?color=brightgreen&label=Version&style=for-the-badge"></a>
-    <a href="https://github.com/rokibulroni/professor-osint/stargazers"><img src="https://img.shields.io/github/stars/rokibulroni/professor-osint?color=blue&style=for-the-badge"></a>
-    <a href="https://github.com/rokibulroni/professor-osint/network/members"><img src="https://img.shields.io/github/forks/rokibulroni/professor-osint?color=yellow&style=for-the-badge"></a>
-    <a href="https://github.com/rokibulroni/professor-osint/blob/main/LICENSE"><img src="https://img.shields.io/github/license/rokibulroni/professor-osint?style=for-the-badge"></a>
-  </p>
+<p>
+  <a href="https://github.com/rokibulroni/professor-osint/releases">
+    <img src="https://img.shields.io/github/v/release/rokibulroni/professor-osint?color=brightgreen&label=Version&style=for-the-badge" alt="Version">
+  </a>
+  <a href="https://github.com/rokibulroni/professor-osint/stargazers">
+    <img src="https://img.shields.io/github/stars/rokibulroni/professor-osint?color=blue&style=for-the-badge" alt="Stars">
+  </a>
+  <a href="https://github.com/rokibulroni/professor-osint/network/members">
+    <img src="https://img.shields.io/github/forks/rokibulroni/professor-osint?color=yellow&style=for-the-badge" alt="Forks">
+  </a>
+  <a href="https://github.com/rokibulroni/professor-osint/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/rokibulroni/professor-osint?style=for-the-badge" alt="License">
+  </a>
+</p>
 
   <p><i>Fast. Native. Dependency-Free. Enterprise-Ready.</i></p>
 </div>
