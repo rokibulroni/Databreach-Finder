@@ -65,8 +65,8 @@ docker-compose run databreach-finder -q "target_company" --extract emails --tor
 ### 💻 Option 2: Native Python
 Ensure you have Python 3.11+ installed.
 ```bash
-git clone https://github.com/rokibulroni/Databreach-Finder.git
-cd Databreach-Finder
+git clone https://github.com/rokibulroni/databreach-finder.git
+cd databreach-finder
 
 # Create a virtual environment (optional but recommended)
 python3 -m venv venv
