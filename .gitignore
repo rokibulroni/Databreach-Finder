@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environment
+venv/
+ 
+ 
+# IDE / Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# MacOS
+.DS_Store
