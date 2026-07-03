@@ -58,15 +58,15 @@ class NetMixin:
             }
         
         try:
-            # We use ip-api.com as it returns clean JSON with ISP, Country, IP
-            resp = requests.get("http://ip-api.com/json/", proxies=proxies, timeout=10)
+            # We use ipinfo.io as it is highly reliable and does not aggressively cache
+            resp = requests.get("https://ipinfo.io/json", proxies=proxies, timeout=10)
             if resp.status_code == 200:
                 data = resp.json()
-                if data.get("status") == "success":
+                if "ip" in data:
                     return {
-                        "ip": data.get("query"),
+                        "ip": data.get("ip"),
                         "country": data.get("country"),
-                        "isp": data.get("isp")
+                        "isp": data.get("org", "Unknown ISP")
                     }
         except Exception as e:
             console.print(f"[bold red][!] Network Error while checking IP: {e}[/bold red]")

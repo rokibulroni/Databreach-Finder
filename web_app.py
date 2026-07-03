@@ -162,6 +162,11 @@ async def update_network_config(config: NetworkConfig):
     # Save the config globally
     temp_finder.save_network_config(mode, proxy_url, wg_conf, ovpn_conf)
     
+    # Allow time for VPN tunnel and system routing table to establish
+    if mode in ["wireguard", "openvpn"]:
+        import asyncio
+        await asyncio.sleep(4)
+    
     # Return new status
     temp_finder.apply_network_config() # Reload
     return {
