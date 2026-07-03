@@ -30,6 +30,27 @@ class NetMixin:
                 raise
         return []
 
+    async def _throttle(self, name, per_minute):
+        """Space out calls to a named rate-limited API (e.g. VirusTotal: 4/min).
+
+        Sleeps just enough so consecutive calls under the same ``name`` honor a
+        minimum interval of ``60 / per_minute`` seconds. Timestamps live in a
+        lazily-created dict so this works across the tool's separate
+        ``asyncio.run()`` calls without touching ``__init__``.
+        """
+        if per_minute <= 0:
+            return
+        min_interval = 60.0 / per_minute
+        if not hasattr(self, "_rl_times"):
+            self._rl_times = {}
+        last = self._rl_times.get(name)
+        now = time.monotonic()
+        if last is not None:
+            wait = min_interval - (now - last)
+            if wait > 0:
+                await asyncio.sleep(wait)
+        self._rl_times[name] = time.monotonic()
+
     async def _resolve_async(self, host):
         """Resolve a hostname to an IP without blocking the event loop.
 
