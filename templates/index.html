@@ -549,7 +549,7 @@
         document.getElementById('launchBtn').addEventListener('click', function() {
             const btn = this;
             const terminal = document.getElementById('terminal');
-            const statusIndicator = document.getElementById('status-indicator');
+
             const reportOverlay = document.getElementById('reportOverlay');
             
             // Build config payload
@@ -576,7 +576,7 @@
             reportOverlay.style.display = 'none';
             btn.disabled = true;
             btn.innerText = 'Scan In Progress...';
-            statusIndicator.style.display = 'flex';
+
             
             // Connect WebSocket
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -614,14 +614,14 @@
                     
                     btn.disabled = false;
                     btn.innerText = 'Initialize Scan';
-                    statusIndicator.style.display = 'none';
+
                 }
             };
             
             ws.onclose = function() {
                 btn.disabled = false;
                 btn.innerText = 'Initialize Scan';
-                statusIndicator.style.display = 'none';
+
             };
         });
         

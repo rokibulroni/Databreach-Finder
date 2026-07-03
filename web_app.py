@@ -325,5 +325,15 @@ async def websocket_endpoint(websocket: WebSocket):
 
 if __name__ == "__main__":
     import uvicorn
-    logger.info("Starting Professor OSINT Web Server...")
-    uvicorn.run("web_app:app", host="127.0.0.1", port=8000, reload=True)
+    import socket
+    
+    def get_free_port(start_port=8000):
+        for port in range(start_port, 9000):
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                if s.connect_ex(('127.0.0.1', port)) != 0:
+                    return port
+        return 8000
+
+    port = get_free_port()
+    logger.info(f"Starting Professor OSINT Web Server on port {port}...")
+    uvicorn.run("web_app:app", host="127.0.0.1", port=port)
