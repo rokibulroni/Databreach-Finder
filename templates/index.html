@@ -88,6 +88,7 @@
         .network-badge.tor .indicator { background: #9d4edd; box-shadow: 0 0 10px #9d4edd; }
         .network-badge.proxy .indicator { background: #fca311; box-shadow: 0 0 10px #fca311; }
         .network-badge.wireguard .indicator { background: #ef233c; box-shadow: 0 0 10px #ef233c; }
+        .network-badge.openvpn .indicator { background: #3a86ff; box-shadow: 0 0 10px #3a86ff; }
 
         main {
             display: flex;
@@ -512,7 +513,12 @@
                     <option value="tor">Tor SOCKS5 (127.0.0.1:9050)</option>
                     <option value="proxy">Custom Proxy URL</option>
                     <option value="wireguard">WireGuard VPN</option>
+                    <option value="openvpn">OpenVPN (.ovpn)</option>
                 </select>
+            </div>
+            
+            <div id="sudoWarning" style="display:none; padding:10px; background:rgba(255,76,76,0.1); border-left:3px solid var(--danger); margin-bottom:15px; font-size:0.85rem; color:#ffb3b3;">
+                <strong style="color:var(--danger)">Root Required:</strong> To establish Layer-3 VPN connections, you must run this tool using: <code>sudo professor-osint-web</code>
             </div>
             
             <div class="form-group" id="fgProxy" style="display:none;">
@@ -521,8 +527,8 @@
             </div>
             
             <div class="form-group" id="fgWg" style="display:none;">
-                <label>WireGuard Configuration (.conf contents)</label>
-                <textarea id="netWgConf" placeholder="[Interface]&#10;PrivateKey = ...&#10;Address = ..."></textarea>
+                <label id="vpnLabel">VPN Configuration (.conf / .ovpn)</label>
+                <textarea id="netWgConf" placeholder="Paste your VPN config file contents here..."></textarea>
             </div>
             
             <div class="modal-buttons">
@@ -647,7 +653,7 @@
             document.getElementById('networkModal').style.display = 'flex';
             document.getElementById('netMode').value = currentNetConfig.mode || 'direct';
             document.getElementById('netProxyUrl').value = currentNetConfig.proxy_url || '';
-            document.getElementById('netWgConf').value = currentNetConfig.wireguard_conf || '';
+            document.getElementById('netWgConf').value = (currentNetConfig.mode === 'openvpn') ? (currentNetConfig.openvpn_conf || '') : (currentNetConfig.wireguard_conf || '');
             updateNetFields();
         }
 
@@ -658,13 +664,23 @@
         function updateNetFields() {
             const mode = document.getElementById('netMode').value;
             document.getElementById('fgProxy').style.display = (mode === 'proxy') ? 'block' : 'none';
-            document.getElementById('fgWg').style.display = (mode === 'wireguard') ? 'block' : 'none';
+            document.getElementById('fgWg').style.display = (mode === 'wireguard' || mode === 'openvpn') ? 'block' : 'none';
+            
+            if(mode === 'wireguard' || mode === 'openvpn') {
+                document.getElementById('sudoWarning').style.display = 'block';
+                document.getElementById('vpnLabel').innerText = mode === 'openvpn' ? 'OpenVPN Configuration (.ovpn contents)' : 'WireGuard Configuration (.conf contents)';
+            } else {
+                document.getElementById('sudoWarning').style.display = 'none';
+            }
         }
 
         async function saveNetworkConfig() {
             const mode = document.getElementById('netMode').value;
             const proxy_url = document.getElementById('netProxyUrl').value;
-            const wireguard_conf = document.getElementById('netWgConf').value;
+            let wireguard_conf = "";
+            let openvpn_conf = "";
+            if (mode === 'wireguard') wireguard_conf = document.getElementById('netWgConf').value;
+            if (mode === 'openvpn') openvpn_conf = document.getElementById('netWgConf').value;
             
             document.getElementById('networkText').innerText = "Applying Route...";
             closeNetworkModal();
@@ -673,10 +689,18 @@
                 const res = await fetch('/api/network/config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mode, proxy_url, wireguard_conf })
+                    body: JSON.stringify({ mode, proxy_url, wireguard_conf, openvpn_conf })
                 });
                 const data = await res.json();
-                currentNetConfig = { mode, proxy_url, wireguard_conf };
+                
+                if (data.status === 'error') {
+                    alert(data.message);
+                    term.write(`\r\n\x1b[1;31m[!] ${data.message}\x1b[0m\r\n`);
+                    document.getElementById('networkText').innerText = "VPN Failed";
+                    return;
+                }
+                
+                currentNetConfig = { mode, proxy_url, wireguard_conf, openvpn_conf };
                 updateNetworkBadge(mode, data.ip_info);
                 term.write(`\r\n\x1b[1;36m[*] Network route successfully updated to ${mode.toUpperCase()} (IP: ${data.ip_info.ip})\x1b[0m\r\n`);
             } catch (err) {

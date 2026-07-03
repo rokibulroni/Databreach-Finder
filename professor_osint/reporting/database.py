@@ -37,14 +37,15 @@ class DatabaseMixin:
                     return json.load(f)
             except Exception:
                 pass
-        return {"mode": "direct", "proxy_url": "", "wireguard_conf": ""}
+        return {"mode": "direct", "proxy_url": "", "wireguard_conf": "", "openvpn_conf": ""}
 
-    def save_network_config(self, mode, proxy_url="", wireguard_conf=""):
+    def save_network_config(self, mode, proxy_url="", wireguard_conf="", openvpn_conf=""):
         config_path = os.path.join(POSINT_CONFIG_DIR, "network.json")
         data = {
             "mode": mode,
             "proxy_url": proxy_url,
-            "wireguard_conf": wireguard_conf
+            "wireguard_conf": wireguard_conf,
+            "openvpn_conf": openvpn_conf
         }
         try:
             with open(config_path, 'w') as f:

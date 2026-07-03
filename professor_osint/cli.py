@@ -61,6 +61,7 @@ Usage Examples:
     parser.add_argument("--ip-info", action="store_true", help="Display current public IP, Country, and ISP information before scanning")
     parser.add_argument("--proxy", metavar="URL", help="Route traffic through a custom proxy (e.g. socks5://127.0.0.1:9050)")
     parser.add_argument("--wireguard", metavar="CONF", help="Path to a WireGuard .conf file to connect VPN before scanning")
+    parser.add_argument("--openvpn", metavar="CONF", help="Path to an OpenVPN .ovpn file to connect VPN before scanning")
     parser.add_argument("-t", "--threads", type=int, default=10, help="Number of concurrent connections (default: 10)")
     parser.add_argument("--tor", action="store_true", help="Legacy alias for --proxy socks5://127.0.0.1:9050")
     parser.add_argument("--report", choices=['html'], help="Generate a professional HTML report")
@@ -112,6 +113,7 @@ Usage Examples:
         authorized=args.authorized,
         cli_proxy=args.proxy,
         cli_wireguard=args.wireguard,
+        cli_openvpn=args.openvpn,
         ip_info=args.ip_info
     )
     finder.print_banner()

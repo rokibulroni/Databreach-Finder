@@ -22,9 +22,10 @@ logger = logging.getLogger("professor_osint.web")
 # Pydantic Schema for Scan Configuration
 # ---------------------------------------------------------
 class NetworkConfig(BaseModel):
-    mode: str = Field(default="direct")  # "direct", "tor", "proxy", "wireguard"
+    mode: str = Field(default="direct")  # "direct", "tor", "proxy", "wireguard", "openvpn"
     proxy_url: Optional[str] = Field(default="")
     wireguard_conf: Optional[str] = Field(default="")
+    openvpn_conf: Optional[str] = Field(default="")
 
 class ScanConfig(BaseModel):
     query: Optional[str] = Field(default="", description="Target Domain or Company")
@@ -96,8 +97,17 @@ async def update_network_config(config: NetworkConfig):
     mode = config.mode
     proxy_url = config.proxy_url
     wg_conf = config.wireguard_conf
+    ovpn_conf = config.openvpn_conf
     
-    # If wireguard, we'd theoretically run wg-quick here.
+    # Check for root privileges before executing VPN commands
+    if mode in ["wireguard", "openvpn"]:
+        import os
+        if hasattr(os, 'geteuid') and os.geteuid() != 0:
+            return {
+                "status": "error",
+                "message": "VPN connections require root privileges. Please restart the tool using: sudo professor-osint-web"
+            }
+            
     if mode == "wireguard" and wg_conf:
         import subprocess
         from professor_osint.constants import POSINT_VPN_DIR
@@ -105,18 +115,37 @@ async def update_network_config(config: NetworkConfig):
         with open(conf_path, "w") as f:
             f.write(wg_conf)
         
-        # Try to execute wg-quick (fails gracefully if no sudo/wireguard)
         try:
-            # Drop any existing first
             subprocess.run(["wg-quick", "down", conf_path], capture_output=True)
             res = subprocess.run(["wg-quick", "up", conf_path], capture_output=True)
             if res.returncode != 0:
                 logger.error(f"WireGuard error: {res.stderr.decode()}")
+                return {"status": "error", "message": f"WireGuard failed: {res.stderr.decode()}"}
         except Exception as e:
             logger.error(f"Failed to run wg-quick: {e}")
+            return {"status": "error", "message": f"Failed to execute wg-quick. Is wireguard-tools installed? Error: {e}"}
+            
+    elif mode == "openvpn" and ovpn_conf:
+        import subprocess
+        from professor_osint.constants import POSINT_OPENVPN_DIR
+        conf_path = os.path.join(POSINT_OPENVPN_DIR, "custom.ovpn")
+        with open(conf_path, "w") as f:
+            f.write(ovpn_conf)
+            
+        try:
+            # We kill any existing openvpn processes first (brute force approach for single client use)
+            subprocess.run(["killall", "openvpn"], capture_output=True)
+            # Run OpenVPN in the background as a daemon
+            res = subprocess.run(["openvpn", "--config", conf_path, "--daemon"], capture_output=True)
+            if res.returncode != 0:
+                logger.error(f"OpenVPN error: {res.stderr.decode()}")
+                return {"status": "error", "message": f"OpenVPN failed: {res.stderr.decode()}"}
+        except Exception as e:
+            logger.error(f"Failed to run openvpn: {e}")
+            return {"status": "error", "message": f"Failed to execute openvpn. Is openvpn installed? Error: {e}"}
             
     # Save the config globally
-    temp_finder.save_network_config(mode, proxy_url, wg_conf)
+    temp_finder.save_network_config(mode, proxy_url, wg_conf, ovpn_conf)
     
     # Return new status
     temp_finder.apply_network_config() # Reload

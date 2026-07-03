@@ -6,9 +6,10 @@ POSINT_LOGS_DIR = os.path.join(POSINT_DIR, "logs")
 POSINT_REPORTS_DIR = os.path.join(POSINT_DIR, "reports")
 POSINT_CONFIG_DIR = os.path.join(POSINT_DIR, "config")
 POSINT_VPN_DIR = os.path.join(POSINT_DIR, "wireguard")
+POSINT_OPENVPN_DIR = os.path.join(POSINT_DIR, "openvpn")
 
 # Ensure the directories exist when constants is loaded
-for d in [POSINT_DIR, POSINT_LOGS_DIR, POSINT_REPORTS_DIR, POSINT_CONFIG_DIR, POSINT_VPN_DIR]:
+for d in [POSINT_DIR, POSINT_LOGS_DIR, POSINT_REPORTS_DIR, POSINT_CONFIG_DIR, POSINT_VPN_DIR, POSINT_OPENVPN_DIR]:
     os.makedirs(d, exist_ok=True)
 
 PATTERNS = {

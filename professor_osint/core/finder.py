@@ -34,7 +34,7 @@ class ProfessorOSINT(
 ):
     """Advanced Data Breach & Intelligence Gathering orchestrator."""
 
-    def __init__(self, query=None, extract_type=None, threads=10, use_tor=False, report_format=None, config_path="config.json", username=None, monitor=False, dossier=False, webcheck=False, recommend=False, playbook=False, analyzer=False, workspace=False, phone=False, harvester=False, spider=False, awesome=False, toolbox=False, rustscan=False, ai_analyze=False, social_xray=None, extract_comments=False, limit=200, authorized=False, cli_proxy=None, cli_wireguard=None, ip_info=False):
+    def __init__(self, query=None, extract_type=None, threads=10, use_tor=False, report_format=None, config_path="config.json", username=None, monitor=False, dossier=False, webcheck=False, recommend=False, playbook=False, analyzer=False, workspace=False, phone=False, harvester=False, spider=False, awesome=False, toolbox=False, rustscan=False, ai_analyze=False, social_xray=None, extract_comments=False, limit=200, authorized=False, cli_proxy=None, cli_wireguard=None, cli_openvpn=None, ip_info=False):
         self.query = query
         self.username = username
         self.extract_type = extract_type
@@ -102,7 +102,7 @@ class ProfessorOSINT(
         self.social_xray_results = []
         
         # Apply Network Manager (NetMixin) config
-        self.apply_network_config(cli_proxy, cli_wireguard)
+        self.apply_network_config(cli_proxy, cli_wireguard, cli_openvpn)
         
         # Optional pre-scan IP check
         if ip_info:

@@ -12,10 +12,11 @@ from ..common import console
 class NetMixin:
     """Network resilience helpers: backoff, async DNS, concurrency limiting."""
 
-    def apply_network_config(self, cli_proxy=None, cli_wireguard=None):
+    def apply_network_config(self, cli_proxy=None, cli_wireguard=None, cli_openvpn=None):
         """Merges CLI args with POSINT saved config."""
         self.proxy_url = None
         self.wireguard_conf = None
+        self.openvpn_conf = None
         
         # Load saved config
         if hasattr(self, 'get_network_config'):
@@ -27,6 +28,8 @@ class NetMixin:
                 self.proxy_url = saved.get("proxy_url")
             elif saved_mode == "wireguard":
                 self.wireguard_conf = saved.get("wireguard_conf")
+            elif saved_mode == "openvpn":
+                self.openvpn_conf = saved.get("openvpn_conf")
 
         # CLI overrides
         if getattr(self, 'use_tor', False):
@@ -35,6 +38,15 @@ class NetMixin:
             self.proxy_url = cli_proxy
         if cli_wireguard:
             self.wireguard_conf = cli_wireguard
+        if cli_openvpn:
+            self.openvpn_conf = cli_openvpn
+            
+        # Check sudo requirement for VPN modes
+        if (self.wireguard_conf or self.openvpn_conf):
+            import os
+            if hasattr(os, 'geteuid') and os.geteuid() != 0:
+                console.print("[bold red][!] VPN modes (WireGuard/OpenVPN) require root privileges.[/bold red]")
+                console.print("[bold yellow][i] Please run the tool using: sudo professor-osint[/bold yellow]")
 
     def get_ip_info(self):
         """Fetches the current public IP and metadata using the active proxy."""
