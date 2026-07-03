@@ -594,6 +594,11 @@
                             (provider, model, endpoint) with live validation.</td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--config-api</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Interactive setup wizard for OSINT API keys
+                            (Shodan, VirusTotal, Hunter.io).</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
                         <td style="padding: 15px; white-space: nowrap;"><code>-x, --dossier</code></td>
                         <td style="padding: 15px; color: var(--text-dim);">Generate Deep Dossier for username.</td>
                     </tr>
@@ -604,9 +609,24 @@
                             <code>eth</code>, <code>aws_key</code>, <code>jwt</code>, <code>rsa_private</code>.</td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--extract-comments</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Force the Social X-Ray engine to also scrape
+                            public comments under the target.</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
                         <td style="padding: 15px; white-space: nowrap;"><code>--harvester</code></td>
                         <td style="padding: 15px; color: var(--text-dim);">Domain Intelligence Engine (Rapid Subdomain
                             and Email Enumeration).</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--i-am-authorized</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Confirm authorized use and skip the Social X-Ray
+                            consent prompt.</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--limit LIMIT</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Cap the number of posts/comments extracted by Social
+                            X-Ray (default: 200).</td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--border);">
                         <td style="padding: 15px; white-space: nowrap;"><code>-m, --monitor</code></td>
@@ -642,6 +662,11 @@
                         <td style="padding: 15px; white-space: nowrap;"><code>--rustscan</code></td>
                         <td style="padding: 15px; color: var(--text-dim);">RustScan Engine (Ultra-Fast Asynchronous Port
                             Scanner).</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--social-xray URL</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Deep Social Media Intelligence: extract public
+                            posts/comments from a YouTube or Reddit link.</td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--border);">
                         <td style="padding: 15px; white-space: nowrap;"><code>--spider</code></td>

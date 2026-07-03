@@ -114,9 +114,13 @@ Here is a brief, detailed A-Z list of all available commands and flags:
 | `--awesome` | Resource Discovery Engine (Discover Top Curated GitHub Tools). |
 | `-c, --config` | Path to custom config file (default: config.json). |
 | `--config-ai` | Interactive setup wizard for the AI analyst (provider, model, endpoint) with live validation. |
+| `--config-api` | Interactive setup wizard for OSINT API keys (Shodan, VirusTotal, Hunter.io). |
 | `-x, --dossier` | Generate Deep Dossier for username. |
 | `-e, --extract` | Specific data pattern to extract from dumps. Choices: `emails`, `cards`, `ipv4`, `btc`, `eth`, `aws_key`, `jwt`, `rsa_private`. |
+| `--extract-comments` | Force the Social X-Ray engine to also scrape public comments under the target. |
 | `--harvester` | Domain Intelligence Engine (Rapid Subdomain and Email Enumeration). |
+| `--i-am-authorized` | Confirm authorized use and skip the Social X-Ray consent prompt. |
+| `--limit LIMIT` | Cap the number of posts/comments extracted by Social X-Ray (default: 200). |
 | `-m, --monitor` | Global Threat Monitor (Live OSINT News Integration). |
 | `--phone` | Telecom Intelligence Profile (Carrier, Region, and Footprint Dorking). |
 | `-p, --playbook` | Fetch ready-to-run Terminal commands for your target. |
@@ -124,6 +128,7 @@ Here is a brief, detailed A-Z list of all available commands and flags:
 | `-r, --recommend` | Fetch OSINT tool recommendations from your Live API ecosystem. |
 | `--report` | Generate a professional HTML report. Choice: `html`. |
 | `--rustscan` | RustScan Engine (Ultra-Fast Asynchronous Port Scanner). |
+| `--social-xray URL` | Deep Social Media Intelligence: extract public posts/comments from a YouTube or Reddit link. |
 | `--spider` | Attack Surface Mapping Engine (Ports, CVEs). |
 | `-t, --threads` | Number of concurrent connections (default: 10). |
 | `--toolbox` | The Professor's Toolbox (Built-in Installer Menu). Search categories: `phishing`, `wireless`, `osint`, `exploitation`, `anonymity`. |
