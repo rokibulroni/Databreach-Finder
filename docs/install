@@ -1,5 +1,30 @@
 #!/usr/bin/env bash
 
+show_spinner() {
+    local -r pid="${1}"
+    local -r msg="${2:-Working...}"
+    local -r delay='0.1'
+    local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+    while kill -0 "${pid}" 2>/dev/null; do
+        for (( i=0; i<${#spinstr}; i++ )); do
+            printf "\r\033[1;36m[%c]\033[0m %s" "${spinstr:$i:1}" "${msg}"
+            sleep "${delay}"
+        done
+    done
+    printf "\r\033[1;32m[✓]\033[0m %s Done!     \n" "${msg}"
+}
+
+print_progress_bar() {
+    local percent=$1
+    local width=30
+    local filled=$(( percent * width / 100 ))
+    local empty=$(( width - filled ))
+    printf "\r\033[1;34m[*] Setup Progress: [\033[1;32m"
+    for ((i=0; i<filled; i++)); do printf "█"; done
+    for ((i=0; i<empty; i++)); do printf "░"; done
+    printf "\033[1;34m] %d%%\033[0m\n" "$percent"
+}
+
 echo -e "\033[1;36m====================================================\033[0m"
 echo -e "\033[1;36m       Professor OSINT - Unified Web Installer      \033[0m"
 echo -e "\033[1;36m====================================================\033[0m"
@@ -122,6 +147,7 @@ fi
 
 echo ""
 echo -e "\033[1;34m[*] Proceeding with Professor OSINT setup...\033[0m"
+print_progress_bar 10
 
 INSTALL_DIR="$HOME/.professor_osint"
 BIN_DIR="$HOME/.local/bin"
@@ -136,6 +162,8 @@ else
     cd "$INSTALL_DIR"
 fi
 
+print_progress_bar 40
+
 # Check for Python 3
 if command -v python3 &>/dev/null; then
     PYTHON_CMD="python3"
@@ -148,7 +176,10 @@ fi
 
 VENV_DIR="$INSTALL_DIR/venv"
 echo -e "\033[1;34m[*] Setting up Virtual Environment...\033[0m"
-$PYTHON_CMD -m venv "$VENV_DIR"
+$PYTHON_CMD -m venv "$VENV_DIR" &
+show_spinner $! "Creating Virtualenv"
+
+print_progress_bar 60
 
 echo -e "\033[1;34m[*] Installing Python requirements...\033[0m"
 if [ "$OS" == "windows" ]; then
@@ -157,9 +188,11 @@ else
     source "$VENV_DIR/bin/activate"
 fi
 
-pip install --upgrade pip --quiet
-pip install -r requirements.txt --quiet
+python -m pip install --upgrade pip
+pip install -r requirements.txt
 deactivate
+
+print_progress_bar 90
 
 mkdir -p "$BIN_DIR"
 
@@ -183,6 +216,8 @@ deactivate
 EOF
     chmod +x "$WRAPPER_SCRIPT"
 fi
+
+print_progress_bar 100
 
 echo -e "\033[1;32m====================================================\033[0m"
 echo -e "\033[1;32m   Installation Successful! \033[0m"
