@@ -26,6 +26,34 @@ fi
 
 echo -e "\033[1;34m[*] Found Python 3 ($PYTHON_CMD)\033[0m"
 
+OS_TYPE=$(uname)
+if [ "$OS_TYPE" == "Darwin" ]; then
+    OS="mac"
+else
+    OS="linux"
+fi
+
+echo ""
+read -p "Do you want to install VPN dependencies (OpenVPN, WireGuard) for Layer-3 security? (y/n): " vpn_choice </dev/tty
+if [[ "$vpn_choice" == "y" || "$vpn_choice" == "Y" ]]; then
+    echo -e "\033[1;34m[*] Installing VPN dependencies for $OS...\033[0m"
+    if [ "$OS" == "mac" ]; then
+        if command -v brew &>/dev/null; then
+            brew install openvpn wireguard-tools
+        else
+            echo -e "\033[0;31m[!] Homebrew not found. Please install openvpn and wireguard-tools manually.\033[0m"
+        fi
+    elif [ "$OS" == "linux" ]; then
+        if command -v apt-get &>/dev/null; then
+            sudo apt-get install -y openvpn wireguard
+        elif command -v pacman &>/dev/null; then
+            sudo pacman -Sy --noconfirm openvpn wireguard-tools
+        else
+            echo -e "\033[0;31m[!] Supported package manager not found! Please install VPN tools manually.\033[0m"
+        fi
+    fi
+fi
+
 # Installation Directories
 INSTALL_DIR="$HOME/.professor_osint"
 VENV_DIR="$INSTALL_DIR/venv"
