@@ -9,7 +9,7 @@ from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 
 from ..common import console
-from ..constants import PATTERNS, DEFAULT_PASTE_SITES
+from ..constants import PATTERNS, DEFAULT_PASTE_SITES, POSINT_LOGS_DIR
 from .net import NetMixin
 from ..reporting.database import DatabaseMixin
 from ..reporting.html_report import HtmlReportMixin
@@ -510,7 +510,7 @@ class ProfessorOSINT(
         ])
 
         if has_data:
-            txt_filename = f'download_results_{self.timestamp}.txt'
+            txt_filename = os.path.join(POSINT_LOGS_DIR, f'download_results_{self.timestamp}.txt')
             with open(txt_filename, 'w', encoding='utf-8') as f:
                 if self.recommended_tools:
                     f.write("=== API ECOSYSTEM RECOMMENDATIONS ===\n")

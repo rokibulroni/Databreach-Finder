@@ -2,7 +2,7 @@
 
 Mirrors the AI provider wizard in ``ai_analyzer.py`` but for the data-gathering
 providers (Shodan, VirusTotal, Hunter.io). Keys are written to a user-global
-env file, ``~/.professor_osint.env``, which ``common.py`` loads on startup as a
+env file, ``~/POSINT/config/api_keys.env``, which ``common.py`` loads on startup as a
 fallback behind the project ``.env`` and real environment variables.
 
 Design notes:
@@ -17,9 +17,10 @@ import os
 import requests
 
 from ..common import console
+from ..constants import POSINT_CONFIG_DIR
 
 # User-global env file loaded by common.py behind the project .env.
-API_ENV_PATH = os.path.join(os.path.expanduser("~"), ".professor_osint.env")
+API_ENV_PATH = os.path.join(POSINT_CONFIG_DIR, "api_keys.env")
 
 # (label, env var, validator-key) for each supported OSINT provider.
 API_PROVIDERS = [

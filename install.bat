@@ -52,12 +52,36 @@ echo python "%INSTALL_DIR%\professor_osint.py" %%*
 echo call deactivate
 ) > "%WRAPPER_SCRIPT%"
 
+set WEB_WRAPPER=%INSTALL_DIR%\professor-osint-web.bat
+echo [*] Creating global command 'professor-osint-web'...
+
+(
+echo @echo off
+echo call "%VENV_DIR%\Scripts\activate.bat"
+echo python "%INSTALL_DIR%\web_app.py" %%*
+echo call deactivate
+) > "%WEB_WRAPPER%"
+
+set UNINSTALL_WRAPPER=%INSTALL_DIR%\professor-osint-uninstall.bat
+echo [*] Creating global uninstaller 'professor-osint-uninstall'...
+
+(
+echo @echo off
+echo echo [*] Uninstalling Professor OSINT...
+echo rmdir /s /q "%INSTALL_DIR%"
+echo echo [+] Successfully completely uninstalled Professor OSINT.
+echo del "%%~f0"
+) > "%UNINSTALL_WRAPPER%"
+
 echo ====================================================
 echo    Installation Successful! 
 echo ====================================================
-echo You can now run the tool using the command:
-echo     %WRAPPER_SCRIPT% --help
+echo You can now run the tool using the commands:
+echo     %WRAPPER_SCRIPT% --help     (For CLI)
+echo     %WEB_WRAPPER%          (For Web Dashboard)
+echo     %UNINSTALL_WRAPPER%    (To remove everything)
 echo.
+echo [*] All configuration and reports will be saved centrally to: %USERPROFILE%\POSINT
 echo To run it from anywhere, add %INSTALL_DIR% to your system PATH.
 
 endlocal

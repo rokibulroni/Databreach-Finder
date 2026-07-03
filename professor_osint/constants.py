@@ -1,4 +1,14 @@
 """Static data tables and API endpoint configuration."""
+import os
+
+POSINT_DIR = os.path.join(os.path.expanduser("~"), "POSINT")
+POSINT_LOGS_DIR = os.path.join(POSINT_DIR, "logs")
+POSINT_REPORTS_DIR = os.path.join(POSINT_DIR, "reports")
+POSINT_CONFIG_DIR = os.path.join(POSINT_DIR, "config")
+
+# Ensure the directories exist when constants is loaded
+for d in [POSINT_DIR, POSINT_LOGS_DIR, POSINT_REPORTS_DIR, POSINT_CONFIG_DIR]:
+    os.makedirs(d, exist_ok=True)
 
 PATTERNS = {
     'emails': r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+',

@@ -2,8 +2,9 @@ import asyncio
 import argparse
 
 from .common import console
-from .constants import PATTERNS
+from .constants import PATTERNS, POSINT_CONFIG_DIR
 from .core.finder import ProfessorOSINT
+import os
 
 
 def main():
@@ -55,7 +56,9 @@ Usage Examples:
     parser.add_argument("-t", "--threads", type=int, default=10, help="Number of concurrent connections (default: 10)")
     parser.add_argument("--tor", action="store_true", help="Route traffic through local Tor SOCKS5 proxy (127.0.0.1:9050)")
     parser.add_argument("--report", choices=['html'], help="Generate a professional HTML report")
-    parser.add_argument("-c", "--config", default="config.json", help="Path to custom config file (default: config.json)")
+    
+    default_config = os.path.join(POSINT_CONFIG_DIR, "config.json")
+    parser.add_argument("-c", "--config", default=default_config, help=f"Path to custom config file (default: {default_config})")
     
     args = parser.parse_args()
 

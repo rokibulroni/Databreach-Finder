@@ -6,7 +6,7 @@ local engines (Ollama, LM Studio, any OpenAI-compatible endpoint) and cloud
 engines (OpenAI, DeepSeek, Gemini, Anthropic).
 
 Design notes:
-- Provider / model / endpoint preferences live in ``~/.professor_osint_config.json``.
+- Provider / model / endpoint preferences live in ``~/POSINT/config/ai_analyzer.json``.
 - API keys are read from the environment (or a local ``.env`` via python-dotenv),
   matching how the rest of the tool handles secrets — they are never written to
   the plaintext config file.
@@ -20,8 +20,9 @@ import logging
 import requests
 
 from ..common import console
+from ..constants import POSINT_CONFIG_DIR
 
-CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".professor_osint_config.json")
+CONFIG_PATH = os.path.join(POSINT_CONFIG_DIR, "ai_analyzer.json")
 
 # Engines that speak the OpenAI /chat/completions schema.
 OPENAI_COMPATIBLE = {"openai", "deepseek", "ollama", "lmstudio", "local"}

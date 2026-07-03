@@ -4,6 +4,7 @@ import re
 import logging
 
 from rich.console import Console
+from .constants import POSINT_LOGS_DIR, POSINT_CONFIG_DIR
 
 console = Console()
 
@@ -20,7 +21,7 @@ def redact(text):
 
 # Configure Logging
 logging.basicConfig(
-    filename='databreach_app.log',
+    filename=os.path.join(POSINT_LOGS_DIR, 'databreach_app.log'),
     filemode='a',
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO
@@ -46,9 +47,9 @@ try:
     # Project-level .env first (does not override real env vars), then a
     # user-global file written by `--config-api` as a cross-directory fallback.
     # load_dotenv never overrides already-set vars, so precedence is:
-    #   real environment  >  project .env  >  ~/.professor_osint.env
+    #   real environment  >  project .env  >  ~/POSINT/config/api_keys.env
     load_dotenv()
-    load_dotenv(os.path.join(os.path.expanduser("~"), ".professor_osint.env"))
+    load_dotenv(os.path.join(POSINT_CONFIG_DIR, "api_keys.env"))
     HAS_DOTENV = True
 except ImportError:
     HAS_DOTENV = False

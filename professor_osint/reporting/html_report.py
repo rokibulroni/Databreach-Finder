@@ -3,6 +3,7 @@ import datetime
 import logging
 
 from ..common import console
+from ..constants import POSINT_REPORTS_DIR
 
 
 class HtmlReportMixin:
@@ -322,7 +323,7 @@ class HtmlReportMixin:
         </html>
         """
 
-        filename = f'report_{self.timestamp}.html'
+        filename = os.path.join(POSINT_REPORTS_DIR, f'report_{self.timestamp}.html')
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(html_content)
         console.print(f"[bold green][+] Professional HTML report saved to {filename}[/bold green]")

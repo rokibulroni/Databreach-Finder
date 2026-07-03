@@ -67,11 +67,43 @@ EOF
 
 chmod +x "$WRAPPER_SCRIPT"
 
+# Create Web App wrapper script
+WEB_WRAPPER="$BIN_DIR/professor-osint-web"
+echo -e "\033[1;34m[*] Creating global command 'professor-osint-web'...\033[0m"
+
+cat << EOF > "$WEB_WRAPPER"
+#!/usr/bin/env bash
+source "$VENV_DIR/bin/activate"
+python "$INSTALL_DIR/web_app.py" "\$@"
+deactivate
+EOF
+
+chmod +x "$WEB_WRAPPER"
+
+# Create Uninstaller wrapper script
+UNINSTALL_WRAPPER="$BIN_DIR/professor-osint-uninstall"
+echo -e "\033[1;34m[*] Creating global uninstaller 'professor-osint-uninstall'...\033[0m"
+
+cat << EOF > "$UNINSTALL_WRAPPER"
+#!/usr/bin/env bash
+echo -e "\033[1;31m[*] Uninstalling Professor OSINT...\033[0m"
+rm -rf "$INSTALL_DIR"
+rm -f "$WRAPPER_SCRIPT"
+rm -f "$WEB_WRAPPER"
+rm -f "\$0"
+echo -e "\033[1;32m[+] Successfully completely uninstalled Professor OSINT.\033[0m"
+EOF
+
+chmod +x "$UNINSTALL_WRAPPER"
+
 echo -e "\033[1;32m====================================================\033[0m"
 echo -e "\033[1;32m   Installation Successful! \033[0m"
 echo -e "\033[1;32m====================================================\033[0m"
-echo -e "\033[1;37mYou can now run the tool from anywhere using the command:\033[0m"
-echo -e "\n    \033[1;33mprofessor-osint --help\033[0m\n"
+echo -e "\033[1;37mYou can now run the tool from anywhere using the commands:\033[0m"
+echo -e "\n    \033[1;33mprofessor-osint --help\033[0m   (For CLI)"
+echo -e "    \033[1;33mprofessor-osint-web\033[0m      (For Web Dashboard)"
+echo -e "    \033[1;31mprofessor-osint-uninstall\033[0m (To remove everything)\n"
+echo -e "\033[1;34m[*] All configuration and reports will be saved centrally to: ~/POSINT\033[0m\n"
 
 # Check if ~/.local/bin is in PATH
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
