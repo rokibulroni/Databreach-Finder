@@ -17,6 +17,7 @@ from ..reporting.ai_analyzer import AiAnalyzerMixin
 from ..scanners.domain import DomainScannersMixin
 from ..scanners.people import PeopleScannersMixin
 from ..scanners.discovery import DiscoveryScannersMixin
+from ..scanners.social_xray import SocialXrayMixin
 
 
 class ProfessorOSINT(
@@ -27,10 +28,11 @@ class ProfessorOSINT(
     DomainScannersMixin,
     PeopleScannersMixin,
     DiscoveryScannersMixin,
+    SocialXrayMixin,
 ):
     """Advanced Data Breach & Intelligence Gathering orchestrator."""
 
-    def __init__(self, query=None, extract_type=None, threads=10, use_tor=False, report_format=None, config_path="config.json", username=None, monitor=False, dossier=False, webcheck=False, recommend=False, playbook=False, analyzer=False, workspace=False, phone=False, harvester=False, spider=False, awesome=False, toolbox=False, rustscan=False, ai_analyze=False):
+    def __init__(self, query=None, extract_type=None, threads=10, use_tor=False, report_format=None, config_path="config.json", username=None, monitor=False, dossier=False, webcheck=False, recommend=False, playbook=False, analyzer=False, workspace=False, phone=False, harvester=False, spider=False, awesome=False, toolbox=False, rustscan=False, ai_analyze=False, social_xray=None, extract_comments=False, limit=200, authorized=False):
         self.query = query
         self.username = username
         self.extract_type = extract_type
@@ -52,6 +54,12 @@ class ProfessorOSINT(
         self.rustscan = rustscan
         self.ai_analyze = ai_analyze
         self.ai_report = None
+
+        # Deep Social Media Intelligence (--social-xray)
+        self.social_xray = social_xray
+        self.extract_comments = extract_comments
+        self.limit = max(1, limit)
+        self.authorized = authorized
 
         # Workspace Cross-Pollination (Email -> Username)
         if self.workspace and self.query and '@' in self.query:
@@ -89,6 +97,7 @@ class ProfessorOSINT(
         self.awesome_results = []
         self.toolbox_results = []
         self.rustscan_results = []
+        self.social_xray_results = []
         self.timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         
         # Load Configuration
@@ -158,7 +167,9 @@ class ProfessorOSINT(
             status_lines.append("[bold bright_magenta]🧰 The Professor's Toolbox (Built-in Installers):[/bold bright_magenta] ACTIVE")
         if self.rustscan:
             status_lines.append("[bold red]⚡ Ultra-Fast Active Port Scanner:[/bold red] ACTIVE")
-            
+        if self.social_xray:
+            status_lines.append("[bold bright_cyan]🛰️  Social X-Ray (Deep Post/Comment Extraction):[/bold bright_cyan] ACTIVE")
+
         status_text = "\n".join(status_lines) if status_lines else "[dim]No active modular flags set[/dim]"
         
         info_panel = (
@@ -388,8 +399,42 @@ class ProfessorOSINT(
             table.add_row(
                 ", ".join(map(str, self.rustscan_results))
             )
-            
+
             console.print(table)
+
+        # Display Social X-Ray Deep Dive Results
+        if self.social_xray_results:
+            for result in self.social_xray_results:
+                table = Table(
+                    title=f"🛰️ Social X-Ray: {result['platform']} — {result.get('title', 'Target')}",
+                    show_lines=True,
+                )
+                table.add_column("Type", style="cyan", no_wrap=True)
+                table.add_column("Author", style="blue", no_wrap=True)
+                table.add_column("Timestamp", style="dim")
+                table.add_column("Content", style="white")
+                table.add_column("Engagement", style="yellow", justify="right")
+
+                for entry in result['entries'][:50]:
+                    text = (entry.get('text') or '').replace("\n", " ").strip()
+                    if len(text) > 160:
+                        text = text[:160] + "…"
+                    table.add_row(
+                        entry.get('type', 'item').capitalize(),
+                        str(entry.get('author') or 'anonymous'),
+                        str(entry.get('timestamp') or 'Unknown'),
+                        text or "[dim]—[/dim]",
+                        str(entry.get('engagement') or ''),
+                    )
+
+                console.print(table)
+                extra = len(result['entries']) - 50
+                if extra > 0:
+                    console.print(f"[dim]...and {extra} more extracted item(s) (saved to report/DB).[/dim]")
+            console.print(
+                f"[bold bright_cyan][+] Social X-Ray captured "
+                f"{sum(len(r['entries']) for r in self.social_xray_results)} public item(s).[/bold bright_cyan]"
+            )
 
         # Display Social Recon Results
         if self.username:
@@ -449,7 +494,8 @@ class ProfessorOSINT(
             self.results, self.workspace_results, self.phone_results,
             self.harvester_results.get('subdomains'), self.harvester_results.get('emails'),
             self.spider_results, self.awesome_results, self.toolbox_results,
-            self.rustscan_results, self.social_results, self.news_results
+            self.rustscan_results, self.social_results, self.news_results,
+            self.social_xray_results
         ])
 
         if has_data:
@@ -531,6 +577,18 @@ class ProfessorOSINT(
                     for profile in self.social_results:
                         f.write(f"{profile['platform']}: {profile['url']}\n")
                         if profile.get('bio'): f.write(f"  Bio: {profile['bio']}\n")
+                if self.social_xray_results:
+                    f.write("\n=== SOCIAL DEEP DIVE (X-RAY) ===\n")
+                    for result in self.social_xray_results:
+                        f.write(f"[{result['platform']}] {result.get('title', 'Target')} -> {result['url']}\n")
+                        for entry in result['entries']:
+                            text = (entry.get('text') or '').replace("\n", " ").strip()
+                            f.write(
+                                f"  ({entry.get('type', 'item')}) {entry.get('author') or 'anonymous'} "
+                                f"[{entry.get('timestamp') or 'Unknown'}] "
+                                f"({entry.get('engagement') or ''}): {text}\n"
+                            )
+                        f.write("-" * 50 + "\n")
                 if self.news_results:
                     f.write("\n=== LIVE THREAT INTELLIGENCE ===\n")
                     for source, headline in self.news_results:

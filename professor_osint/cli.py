@@ -21,6 +21,10 @@ def main():
     parser.add_argument("--awesome", action="store_true", help="Resource Discovery Engine (Discover Top Curated GitHub Tools)")
     parser.add_argument("--toolbox", action="store_true", help="The Professor's Toolbox (Built-in Installer Menu)")
     parser.add_argument("--rustscan", action="store_true", help="RustScan Engine (Ultra-Fast Asynchronous Port Scanner)")
+    parser.add_argument("--social-xray", dest="social_xray", metavar="URL", help="Deep Social Media Intelligence: extract public posts/comments from a YouTube or Reddit link")
+    parser.add_argument("--extract-comments", dest="extract_comments", action="store_true", help="Force the Social X-Ray engine to also scrape public comments under the target")
+    parser.add_argument("--limit", type=int, default=200, help="Cap the number of posts/comments extracted by Social X-Ray (default: 200)")
+    parser.add_argument("--i-am-authorized", dest="authorized", action="store_true", help="Confirm authorized use and skip the Social X-Ray consent prompt")
     parser.add_argument("--ai-analyze", dest="ai_analyze", action="store_true", help="AI Threat Intelligence Analysis (turn raw OSINT dumps into an analyst report)")
     parser.add_argument("--config-ai", dest="config_ai", action="store_true", help="Interactive setup wizard for the AI analyst (provider, model, endpoint)")
     parser.add_argument("-r", "--recommend", action="store_true", help="Fetch OSINT tool recommendations from your Live API ecosystem")
@@ -38,8 +42,8 @@ def main():
         ProfessorOSINT(config_path=args.config).config_ai_wizard()
         return
 
-    if not args.query and not args.username:
-        console.print("[bold red][!] You must provide either a --query (-q) or a --username (-u).[/bold red]")
+    if not args.query and not args.username and not args.social_xray:
+        console.print("[bold red][!] You must provide a --query (-q), a --username (-u), or a --social-xray URL.[/bold red]")
         return
 
     finder = ProfessorOSINT(
@@ -63,7 +67,11 @@ def main():
         awesome=args.awesome,
         toolbox=args.toolbox,
         rustscan=args.rustscan,
-        ai_analyze=args.ai_analyze
+        ai_analyze=args.ai_analyze,
+        social_xray=args.social_xray,
+        extract_comments=args.extract_comments,
+        limit=args.limit,
+        authorized=args.authorized
     )
     finder.print_banner()
     finder.phone_intelligence()
@@ -79,6 +87,8 @@ def main():
     finder.dork_search()
     finder.workspace_search()
     asyncio.run(finder.process_urls_async())
+    if finder.social_xray:
+        asyncio.run(finder.social_xray_scan())
     finder.display_results()
 
 

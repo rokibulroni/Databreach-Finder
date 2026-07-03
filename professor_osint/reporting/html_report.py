@@ -244,7 +244,36 @@ class HtmlReportMixin:
                     
                 html_content += f"<tr><td>{uname}</td><td><strong>{platform}</strong></td><td><a href='{url}'>{url}</a></td><td>{meta_html}</td><td>{conf_html}</td></tr>"
             html_content += "</table>"
-            
+
+        if self.social_xray_results:
+            for result in self.social_xray_results:
+                platform = html.escape(str(result.get('platform', '')))
+                title = html.escape(str(result.get('title', 'Target')))
+                target_url = html.escape(str(result.get('url', '')))
+                html_content += f"""
+            <h2>🛰️ Social Deep Dive — {platform}</h2>
+            <p><strong>Target:</strong> {title} &middot; <a href='{target_url}' target='_blank'>{target_url}</a></p>
+            <table>
+                <tr>
+                    <th width="10%">Type</th>
+                    <th width="15%">Author</th>
+                    <th width="15%">Timestamp</th>
+                    <th>Content</th>
+                    <th width="12%">Engagement</th>
+                </tr>
+            """
+                for entry in result['entries']:
+                    e_type = html.escape(str(entry.get('type', 'item')).capitalize())
+                    e_author = html.escape(str(entry.get('author') or 'anonymous'))
+                    e_ts = html.escape(str(entry.get('timestamp') or 'Unknown'))
+                    e_text = html.escape((entry.get('text') or '').strip()) or '&mdash;'
+                    e_eng = html.escape(str(entry.get('engagement') or ''))
+                    html_content += (
+                        f"<tr><td>{e_type}</td><td>{e_author}</td><td>{e_ts}</td>"
+                        f"<td>{e_text}</td><td>{e_eng}</td></tr>"
+                    )
+                html_content += "</table>"
+
         if self.news_results:
             html_content += """
             <h2>📡 Live Threat Intelligence (WorldMonitor)</h2>

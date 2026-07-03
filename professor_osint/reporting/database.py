@@ -83,6 +83,20 @@ class DatabaseMixin:
                     UNIQUE(domain, ip_address)
                 )
             ''')
+            self.cursor.execute('''
+                CREATE TABLE IF NOT EXISTS social_xray (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    platform TEXT,
+                    url TEXT,
+                    entry_type TEXT,
+                    author_hash TEXT,
+                    posted_at TEXT,
+                    content TEXT,
+                    engagement TEXT,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(url, entry_type, author_hash, content)
+                )
+            ''')
             self.conn.commit()
             logging.info("Database initialized successfully.")
         except Exception as e:
@@ -122,6 +136,20 @@ class DatabaseMixin:
                 self.conn.commit()
         except Exception as e:
             logging.error(f"Error saving social DB: {e}")
+
+    def save_social_xray_to_db(self, platform, url, entry_type, author_hash, posted_at, content, engagement):
+        """Persist one extracted post/comment. Author is stored anonymized (hashed)."""
+        try:
+            self.cursor.execute(
+                'INSERT INTO social_xray (platform, url, entry_type, author_hash, posted_at, content, engagement) '
+                'VALUES (?, ?, ?, ?, ?, ?, ?)',
+                (platform, url, entry_type, author_hash, posted_at, content, engagement)
+            )
+            self.conn.commit()
+        except sqlite3.IntegrityError:
+            pass
+        except Exception as e:
+            logging.error(f"Error saving social x-ray DB: {e}")
 
     def save_news_to_db(self, query, source, headline):
         try:

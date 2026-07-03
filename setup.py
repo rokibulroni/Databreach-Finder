@@ -17,6 +17,12 @@ setup(
     url="https://github.com/rokibul/Databreach-Finder",
     packages=find_packages(include=["professor_osint", "professor_osint.*"]),
     install_requires=requirements,
+    extras_require={
+        # Heavyweight deep-social-media extraction deps (Social X-Ray engine).
+        # Kept optional so the core install stays light:
+        #   pip install professor-osint[social]
+        "social": ["yt-dlp"],
+    },
     include_package_data=True,
     entry_points={
         "console_scripts": [
