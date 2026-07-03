@@ -74,15 +74,26 @@ pip install -r requirements.txt
 
 ### 🗑️ Uninstallation
 
-If you installed via the one-click web installer or `install.sh`, you can remove everything entirely by running the uninstaller script:
+**1. Standard Uninstallation (Tool Only)**
+If you installed via the one-click web installer or `install.sh`, you can remove the tool and its isolated Python virtual environment by running:
 ```bash
 ./uninstall.sh   # Mac / Linux
 uninstall.bat    # Windows
 ```
+*(If you installed globally via pip, run `pip uninstall professor-osint`)*
 
-If you installed via pip, simply run:
+**2. Complete Eradication (Tool + System Dependencies)**
+To remove the tool AND all third-party system packages it relies on (Tor, Nmap, RustScan), run the uninstaller above, then use your package manager:
 ```bash
-pip uninstall professor-osint
+# macOS (Homebrew)
+brew uninstall tor nmap rustscan
+
+# Debian / Ubuntu (APT)
+sudo apt-get remove --purge tor nmap rustscan
+sudo apt-get autoremove
+
+# Arch Linux (Pacman)
+sudo pacman -Rns tor nmap rustscan
 ```
 
 ### Basic Usage
