@@ -102,6 +102,17 @@ async def update_network_config(config: NetworkConfig):
     wg_conf = config.wireguard_conf
     ovpn_conf = config.openvpn_conf
     
+    import subprocess
+    import os
+    from professor_osint.constants import POSINT_VPN_DIR
+    
+    # Always attempt to disconnect existing VPNs first to ensure a clean state
+    subprocess.run(["killall", "openvpn"], capture_output=True)
+    
+    wg_conf_path = os.path.join(POSINT_VPN_DIR, "custom.conf")
+    if os.path.exists(wg_conf_path):
+        subprocess.run(["wg-quick", "down", wg_conf_path], capture_output=True)
+        
     # Check for root privileges before executing VPN commands
     if mode in ["wireguard", "openvpn"]:
         import os
@@ -136,9 +147,6 @@ async def update_network_config(config: NetworkConfig):
             f.write(ovpn_conf)
             
         try:
-            # We kill any existing openvpn processes first (brute force approach for single client use)
-            subprocess.run(["killall", "openvpn"], capture_output=True)
-            
             cmd = ["openvpn", "--config", conf_path, "--daemon"]
             
             # Write credentials to auth.txt if provided
