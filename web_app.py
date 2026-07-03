@@ -4,7 +4,7 @@ import json
 import logging
 import asyncio
 from typing import Optional
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Response
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -157,6 +157,10 @@ async def update_network_config(config: NetworkConfig):
 # ---------------------------------------------------------
 # Serve Static Assets (HTML)
 # ---------------------------------------------------------
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return Response(content=b"", media_type="image/x-icon")
+
 @app.get("/", response_class=HTMLResponse, summary="Serve Web Dashboard")
 async def read_root():
     """Serves the main HTML dashboard for Professor OSINT."""
