@@ -26,8 +26,12 @@ echo [*] Installing Professor OSINT to %INSTALL_DIR%...
 :: Create directory
 if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%"
 
-:: Copy files
-xcopy /E /I /Y . "%INSTALL_DIR%" >nul
+:: Copy files (excluding local virtualenvs, git files, and installer scripts)
+robocopy . "%INSTALL_DIR%" /E /XD venv .git /XF install.sh install.bat >nul
+if %errorlevel% gtr 7 (
+    echo [!] Error copying files.
+    exit /b 1
+)
 
 echo [*] Creating Virtual Environment...
 python -m venv "%VENV_DIR%"

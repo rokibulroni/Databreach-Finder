@@ -37,8 +37,12 @@ echo -e "\033[1;34m[*] Installing Professor OSINT to $INSTALL_DIR...\033[0m"
 mkdir -p "$INSTALL_DIR"
 mkdir -p "$BIN_DIR"
 
-# Copy files
-cp -r ./* "$INSTALL_DIR/"
+# Copy files, avoiding local virtualenvs or scripts
+for item in *; do
+    if [ "$item" != "venv" ] && [ "$item" != ".git" ] && [ "$item" != "install.sh" ] && [ "$item" != "install.bat" ]; then
+        cp -R "$item" "$INSTALL_DIR/" 2>/dev/null || true
+    fi
+done
 
 # Setup Virtual Environment
 echo -e "\033[1;34m[*] Creating Virtual Environment...\033[0m"
