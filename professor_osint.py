@@ -325,40 +325,55 @@ class ProfessorOSINT:
         return {}
 
     def print_banner(self):
-        banner = "[bold cyan]🔍 Professor OSINT [Enterprise OSINT][/bold cyan]\n[bold green]Author:[/bold green] Rokibul Roni\n[bold green]Version:[/bold green] 7.0 (API Ecosystem Edition)"
+        ascii_art = r"""
+[bold cyan]  _____           __                              ____   _____ ___ _   _ _____ [/bold cyan]
+[bold cyan] |  __ \         / _|                            / __ \ / ____|_ _| \ | |_   _|[/bold cyan]
+[bold cyan] | |__) | __ ___| |_ ___  ___ ___  ___  _ __    | |  | | (___  | ||  \| | | |  [/bold cyan]
+[bold blue] |  ___/ '__/ _ \  _/ _ \/ __/ __|/ _ \| '__|   | |  | |\___ \ | || . ` | | |  [/bold blue]
+[bold blue] | |   | | |  __/ ||  __/\__ \__ \ (_) | |      | |__| |____) || || |\  |_| |_ [/bold blue]
+[bold blue] |_|   |_|  \___|_| \___||___/___/\___/|_|       \____/|_____/|___|_| \_|_____|[/bold blue]
+        """
+        
+        status_lines = []
         if self.use_tor:
-            banner += "\n[bold magenta]🛡️ Tor Mode:[/bold magenta] ACTIVE"
+            status_lines.append("[bold magenta]🛡️  Tor Mode:[/bold magenta] ACTIVE")
         if self.monitor:
-            banner += "\n[bold red]🌐 Live Threat Monitoring:[/bold red] ACTIVE"
+            status_lines.append("[bold red]🌐 Live Threat Monitoring:[/bold red] ACTIVE")
         if self.dossier:
-            banner += "\n[bold yellow]📂 Maigret Dossier Extraction:[/bold yellow] ACTIVE"
+            status_lines.append("[bold yellow]📂 Maigret Dossier Extraction:[/bold yellow] ACTIVE")
         if self.webcheck:
-            banner += "\n[bold yellow]📂 Deep Dossier Extraction:[/bold yellow] ACTIVE"
+            status_lines.append("[bold yellow]📂 Deep Dossier Extraction:[/bold yellow] ACTIVE")
         if self.workspace:
-            banner += "\n[bold green]💼 Enterprise Workspace Intelligence:[/bold green] ACTIVE"
-        if self.monitor:
-            banner += "\n[bold blue]📰 Global Threat Monitor:[/bold blue] ACTIVE"
-        if self.webcheck:
-            banner += "\n[bold cyan]🌐 Live Domain Intelligence:[/bold cyan] ACTIVE"
+            status_lines.append("[bold green]💼 Enterprise Workspace Intelligence:[/bold green] ACTIVE")
         if self.recommend:
-            banner += "\n[bold magenta]💡 OSINT Tool Recommender:[/bold magenta] ACTIVE"
+            status_lines.append("[bold magenta]💡 OSINT Tool Recommender:[/bold magenta] ACTIVE")
         if self.playbook:
-            banner += "\n[bold red]💻 Terminal Attack Playbook:[/bold red] ACTIVE"
+            status_lines.append("[bold red]💻 Terminal Attack Playbook:[/bold red] ACTIVE")
         if self.analyzer:
-            banner += "\n[bold bright_magenta]🧠 Social Analyzer (Permutations & Confidence):[/bold bright_magenta] ACTIVE"
+            status_lines.append("[bold bright_magenta]🧠 Social Analyzer (Permutations & Confidence):[/bold bright_magenta] ACTIVE")
         if self.phone:
-            banner += "\n[bold yellow]📞 Telecom Intelligence Engine:[/bold yellow] ACTIVE"
+            status_lines.append("[bold yellow]📞 Telecom Intelligence Engine:[/bold yellow] ACTIVE")
         if self.harvester:
-            banner += "\n[bold green]🌾 Domain Intelligence (Subdomains/Emails):[/bold green] ACTIVE"
+            status_lines.append("[bold green]🌾 Domain Intelligence (Subdomains/Emails):[/bold green] ACTIVE")
         if self.spider:
-            banner += "\n[bold magenta]🕸️ Attack Surface Mapping Engine:[/bold magenta] ACTIVE"
+            status_lines.append("[bold magenta]🕸️  Attack Surface Mapping Engine:[/bold magenta] ACTIVE")
         if self.awesome:
-            banner += "\n[bold yellow]⭐ Resource Discovery Engine:[/bold yellow] ACTIVE"
+            status_lines.append("[bold yellow]⭐ Resource Discovery Engine:[/bold yellow] ACTIVE")
         if self.toolbox:
-            banner += "\n[bold bright_magenta]🧰 The Professor's Toolbox (Built-in Installers):[/bold bright_magenta] ACTIVE"
+            status_lines.append("[bold bright_magenta]🧰 The Professor's Toolbox (Built-in Installers):[/bold bright_magenta] ACTIVE")
         if self.rustscan:
-            banner += "\n[bold red]⚡ Ultra-Fast Active Port Scanner:[/bold red] ACTIVE"
-        console.print(Panel(banner, expand=False))
+            status_lines.append("[bold red]⚡ Ultra-Fast Active Port Scanner:[/bold red] ACTIVE")
+            
+        status_text = "\n".join(status_lines) if status_lines else "[dim]No active modular flags set[/dim]"
+        
+        info_panel = (
+            f"[bold white]Author:[/bold white] Rokibul Roni\n"
+            f"[bold white]Version:[/bold white] 7.0 (API Ecosystem Edition)\n\n"
+            f"[bold cyan]🔥 Active Modules:[/bold cyan]\n{status_text}"
+        )
+        
+        console.print(Panel(ascii_art.strip(), border_style="cyan", expand=False))
+        console.print(Panel(info_panel, title="[bold green]System Diagnostics[/bold green]", border_style="green", expand=False))
 
     def dork_search(self):
         if not self.query:
