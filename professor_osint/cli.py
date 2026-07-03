@@ -19,10 +19,13 @@ Usage Examples:
   3. Enterprise Workspace Hunt (Google Docs, Trello, Notion):
      professor-osint -q "company_name" --workspace
 
-  4. Social X-Ray (Extract YouTube/Reddit data):
+  4. Network Security & IP Masking:
+     professor-osint -q "target.com" --spider --proxy socks5://127.0.0.1:9050
+
+  5. Social X-Ray (Extract YouTube/Reddit data):
      professor-osint --social-xray "https://youtube.com/watch?v=..." --extract-comments
 
-  5. AI Threat Intelligence Report:
+  6. AI Threat Intelligence Report:
      professor-osint -q "example.com" --spider --ai-analyze
 """
     parser = argparse.ArgumentParser(
@@ -45,16 +48,21 @@ Usage Examples:
     parser.add_argument("--rustscan", action="store_true", help="RustScan Engine (Ultra-Fast Asynchronous Port Scanner)")
     parser.add_argument("--social-xray", dest="social_xray", metavar="URL", help="Deep Social Media Intelligence: extract public posts/comments from a YouTube or Reddit link")
     parser.add_argument("--extract-comments", dest="extract_comments", action="store_true", help="Force the Social X-Ray engine to also scrape public comments under the target")
-    parser.add_argument("--limit", type=int, default=200, help="Cap the number of posts/comments extracted by Social X-Ray (default: 200)")
-    parser.add_argument("--i-am-authorized", dest="authorized", action="store_true", help="Confirm authorized use and skip the Social X-Ray consent prompt")
     parser.add_argument("--ai-analyze", dest="ai_analyze", action="store_true", help="AI Threat Intelligence Analysis (turn raw OSINT dumps into an analyst report)")
     parser.add_argument("--config-ai", dest="config_ai", action="store_true", help="Interactive setup wizard for the AI analyst (provider, model, endpoint)")
-    parser.add_argument("--config-api", dest="config_api", action="store_true", help="Interactive setup wizard for OSINT API keys (Shodan, VirusTotal, Hunter.io)")
+    parser.add_argument("--config-api", action="store_true", help="Launch interactive wizard to configure OSINT API keys (Shodan, VT, etc.)")
     parser.add_argument("-r", "--recommend", action="store_true", help="Fetch OSINT tool recommendations from your Live API ecosystem")
     parser.add_argument("-p", "--playbook", action="store_true", help="Fetch ready-to-run Terminal commands for your target")
     parser.add_argument("-e", "--extract", choices=list(PATTERNS.keys()), help="Specific data pattern to extract from dumps")
+    parser.add_argument("--limit", type=int, default=200, help="Maximum number of items to extract (e.g., comments) (default: 200)")
+    parser.add_argument("--i-am-authorized", dest="authorized", action="store_true", help="Acknowledge you have permission to perform this scan (Required)")
+    
+    # Network Security Arguments
+    parser.add_argument("--ip-info", action="store_true", help="Display current public IP, Country, and ISP information before scanning")
+    parser.add_argument("--proxy", metavar="URL", help="Route traffic through a custom proxy (e.g. socks5://127.0.0.1:9050)")
+    parser.add_argument("--wireguard", metavar="CONF", help="Path to a WireGuard .conf file to connect VPN before scanning")
     parser.add_argument("-t", "--threads", type=int, default=10, help="Number of concurrent connections (default: 10)")
-    parser.add_argument("--tor", action="store_true", help="Route traffic through local Tor SOCKS5 proxy (127.0.0.1:9050)")
+    parser.add_argument("--tor", action="store_true", help="Legacy alias for --proxy socks5://127.0.0.1:9050")
     parser.add_argument("--report", choices=['html'], help="Generate a professional HTML report")
     
     default_config = os.path.join(POSINT_CONFIG_DIR, "config.json")
@@ -101,7 +109,10 @@ Usage Examples:
         social_xray=args.social_xray,
         extract_comments=args.extract_comments,
         limit=args.limit,
-        authorized=args.authorized
+        authorized=args.authorized,
+        cli_proxy=args.proxy,
+        cli_wireguard=args.wireguard,
+        ip_info=args.ip_info
     )
     finder.print_banner()
     finder.phone_intelligence()

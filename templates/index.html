@@ -59,6 +59,36 @@
             color: var(--accent);
         }
 
+        .network-badge {
+            margin-left: auto;
+            background: rgba(102, 252, 241, 0.1);
+            border: 1px solid var(--accent-dim);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .network-badge:hover {
+            background: rgba(102, 252, 241, 0.2);
+        }
+
+        .network-badge .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+        
+        .network-badge.tor .indicator { background: #9d4edd; box-shadow: 0 0 10px #9d4edd; }
+        .network-badge.proxy .indicator { background: #fca311; box-shadow: 0 0 10px #fca311; }
+        .network-badge.wireguard .indicator { background: #ef233c; box-shadow: 0 0 10px #ef233c; }
+
         main {
             display: flex;
             flex: 1;
@@ -281,10 +311,46 @@
             background: rgba(0,0,0,0.2);
         }
         
-        #terminal::-webkit-scrollbar-thumb, .config-panel::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
+        .terminal-panel::-webkit-scrollbar-thumb, .config-panel::-webkit-scrollbar-thumb {
+            background: rgba(102, 252, 241, 0.2);
             border-radius: 4px;
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal {
+            background: #1f2833;
+            border: 1px solid var(--accent-dim);
+            border-radius: 12px;
+            padding: 30px;
+            width: 450px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+        .modal h2 { margin-bottom: 20px; color: var(--accent); }
+        .modal .form-group { margin-bottom: 15px; }
+        .modal .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; }
+        .modal .form-group input, .modal .form-group select, .modal .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 6px;
+        }
+        .modal .form-group textarea { height: 100px; resize: vertical; font-family: monospace; }
+        .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .modal-buttons button { padding: 8px 15px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-cancel { background: rgba(255,255,255,0.1); color: white; }
+        .btn-save { background: var(--accent); color: black; }
 
         .report-overlay {
             position: absolute;
@@ -350,10 +416,10 @@
 <body>
 
     <header>
-        <h1>Professor <span>OSINT</span></h1>
-        <div id="status-indicator" style="margin-left:auto; display:none; align-items:center; gap:10px;">
-            <span style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:var(--accent);">Scan in progress</span>
-            <div class="pulsating-dot"></div>
+        <h1>Professor<span>OSINT</span></h1>
+        <div class="network-badge" id="networkBadge" onclick="openNetworkModal()">
+            <div class="indicator"></div>
+            <span id="networkText">Checking IP...</span>
         </div>
     </header>
 
@@ -434,6 +500,37 @@
             </div>
         </div>
     </main>
+
+    <!-- Network Configuration Modal -->
+    <div class="modal-overlay" id="networkModal">
+        <div class="modal">
+            <h2>Network Security Manager</h2>
+            <div class="form-group">
+                <label>Routing Mode</label>
+                <select id="netMode" onchange="updateNetFields()">
+                    <option value="direct">Direct (No Proxy)</option>
+                    <option value="tor">Tor SOCKS5 (127.0.0.1:9050)</option>
+                    <option value="proxy">Custom Proxy URL</option>
+                    <option value="wireguard">WireGuard VPN</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="fgProxy" style="display:none;">
+                <label>Proxy URL (e.g., socks5://... or http://...)</label>
+                <input type="text" id="netProxyUrl" placeholder="socks5://10.0.0.1:1080">
+            </div>
+            
+            <div class="form-group" id="fgWg" style="display:none;">
+                <label>WireGuard Configuration (.conf contents)</label>
+                <textarea id="netWgConf" placeholder="[Interface]&#10;PrivateKey = ...&#10;Address = ..."></textarea>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeNetworkModal()">Cancel</button>
+                <button class="btn-save" onclick="saveNetworkConfig()">Apply Route</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const ansiUp = new AnsiUp();
@@ -521,6 +618,75 @@
                 statusIndicator.style.display = 'none';
             };
         });
+        
+        // -----------------------------------------------------
+        // Network Security Manager Logic
+        // -----------------------------------------------------
+        let currentNetConfig = {};
+        
+        async function fetchNetworkStatus() {
+            try {
+                const res = await fetch('/api/network/status');
+                const data = await res.json();
+                currentNetConfig = data.config;
+                updateNetworkBadge(data.config.mode, data.ip_info);
+            } catch (err) {
+                console.error("Failed to fetch network status", err);
+            }
+        }
+        
+        function updateNetworkBadge(mode, ip_info) {
+            const badge = document.getElementById('networkBadge');
+            const text = document.getElementById('networkText');
+            
+            badge.className = 'network-badge ' + mode;
+            text.innerHTML = `<strong>IP:</strong> ${ip_info.ip} | ${ip_info.country} (${mode.toUpperCase()})`;
+        }
+
+        function openNetworkModal() {
+            document.getElementById('networkModal').style.display = 'flex';
+            document.getElementById('netMode').value = currentNetConfig.mode || 'direct';
+            document.getElementById('netProxyUrl').value = currentNetConfig.proxy_url || '';
+            document.getElementById('netWgConf').value = currentNetConfig.wireguard_conf || '';
+            updateNetFields();
+        }
+
+        function closeNetworkModal() {
+            document.getElementById('networkModal').style.display = 'none';
+        }
+
+        function updateNetFields() {
+            const mode = document.getElementById('netMode').value;
+            document.getElementById('fgProxy').style.display = (mode === 'proxy') ? 'block' : 'none';
+            document.getElementById('fgWg').style.display = (mode === 'wireguard') ? 'block' : 'none';
+        }
+
+        async function saveNetworkConfig() {
+            const mode = document.getElementById('netMode').value;
+            const proxy_url = document.getElementById('netProxyUrl').value;
+            const wireguard_conf = document.getElementById('netWgConf').value;
+            
+            document.getElementById('networkText').innerText = "Applying Route...";
+            closeNetworkModal();
+            
+            try {
+                const res = await fetch('/api/network/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode, proxy_url, wireguard_conf })
+                });
+                const data = await res.json();
+                currentNetConfig = { mode, proxy_url, wireguard_conf };
+                updateNetworkBadge(mode, data.ip_info);
+                term.write(`\r\n\x1b[1;36m[*] Network route successfully updated to ${mode.toUpperCase()} (IP: ${data.ip_info.ip})\x1b[0m\r\n`);
+            } catch (err) {
+                console.error(err);
+                term.write('\r\n\x1b[1;31m[!] Failed to apply network route.\x1b[0m\r\n');
+            }
+        }
+        
+        // Initial Fetch
+        fetchNetworkStatus();
     </script>
 </body>
 </html>

@@ -21,6 +21,11 @@ logger = logging.getLogger("professor_osint.web")
 # ---------------------------------------------------------
 # Pydantic Schema for Scan Configuration
 # ---------------------------------------------------------
+class NetworkConfig(BaseModel):
+    mode: str = Field(default="direct")  # "direct", "tor", "proxy", "wireguard"
+    proxy_url: Optional[str] = Field(default="")
+    wireguard_conf: Optional[str] = Field(default="")
+
 class ScanConfig(BaseModel):
     query: Optional[str] = Field(default="", description="Target Domain or Company")
     username: Optional[str] = Field(default="", description="Target Username")
@@ -66,7 +71,62 @@ app.add_middleware(
 os.makedirs("templates", exist_ok=True)
 
 # ---------------------------------------------------------
-# HTTP Routes
+# Network API Endpoints
+# ---------------------------------------------------------
+@app.get("/api/network/status")
+async def network_status():
+    from professor_osint.core.finder import ProfessorOSINT
+    # Lightweight instance just to check network
+    temp_finder = ProfessorOSINT()
+    # It will automatically apply the saved network config on init
+    
+    config = temp_finder.get_network_config()
+    ip_info = temp_finder.get_ip_info()
+    
+    return {
+        "config": config,
+        "ip_info": ip_info
+    }
+
+@app.post("/api/network/config")
+async def update_network_config(config: NetworkConfig):
+    from professor_osint.core.finder import ProfessorOSINT
+    temp_finder = ProfessorOSINT()
+    
+    mode = config.mode
+    proxy_url = config.proxy_url
+    wg_conf = config.wireguard_conf
+    
+    # If wireguard, we'd theoretically run wg-quick here.
+    if mode == "wireguard" and wg_conf:
+        import subprocess
+        from professor_osint.constants import POSINT_VPN_DIR
+        conf_path = os.path.join(POSINT_VPN_DIR, "custom.conf")
+        with open(conf_path, "w") as f:
+            f.write(wg_conf)
+        
+        # Try to execute wg-quick (fails gracefully if no sudo/wireguard)
+        try:
+            # Drop any existing first
+            subprocess.run(["wg-quick", "down", conf_path], capture_output=True)
+            res = subprocess.run(["wg-quick", "up", conf_path], capture_output=True)
+            if res.returncode != 0:
+                logger.error(f"WireGuard error: {res.stderr.decode()}")
+        except Exception as e:
+            logger.error(f"Failed to run wg-quick: {e}")
+            
+    # Save the config globally
+    temp_finder.save_network_config(mode, proxy_url, wg_conf)
+    
+    # Return new status
+    temp_finder.apply_network_config() # Reload
+    return {
+        "status": "success",
+        "ip_info": temp_finder.get_ip_info()
+    }
+
+# ---------------------------------------------------------
+# Serve Static Assets (HTML)
 # ---------------------------------------------------------
 @app.get("/", response_class=HTMLResponse, summary="Serve Web Dashboard")
 async def read_root():

@@ -34,7 +34,7 @@ class ProfessorOSINT(
 ):
     """Advanced Data Breach & Intelligence Gathering orchestrator."""
 
-    def __init__(self, query=None, extract_type=None, threads=10, use_tor=False, report_format=None, config_path="config.json", username=None, monitor=False, dossier=False, webcheck=False, recommend=False, playbook=False, analyzer=False, workspace=False, phone=False, harvester=False, spider=False, awesome=False, toolbox=False, rustscan=False, ai_analyze=False, social_xray=None, extract_comments=False, limit=200, authorized=False):
+    def __init__(self, query=None, extract_type=None, threads=10, use_tor=False, report_format=None, config_path="config.json", username=None, monitor=False, dossier=False, webcheck=False, recommend=False, playbook=False, analyzer=False, workspace=False, phone=False, harvester=False, spider=False, awesome=False, toolbox=False, rustscan=False, ai_analyze=False, social_xray=None, extract_comments=False, limit=200, authorized=False, cli_proxy=None, cli_wireguard=None, ip_info=False):
         self.query = query
         self.username = username
         self.extract_type = extract_type
@@ -100,6 +100,21 @@ class ProfessorOSINT(
         self.toolbox_results = []
         self.rustscan_results = []
         self.social_xray_results = []
+        
+        # Apply Network Manager (NetMixin) config
+        self.apply_network_config(cli_proxy, cli_wireguard)
+        
+        # Optional pre-scan IP check
+        if ip_info:
+            info = self.get_ip_info()
+            console.print(f"[bold cyan][*] Network Security Status:[/bold cyan]")
+            console.print(f"    - IP: {info.get('ip')}")
+            console.print(f"    - Country: {info.get('country')}")
+            console.print(f"    - ISP: {info.get('isp')}")
+
+        if not self.use_tor and self.proxy_url:
+            self.use_tor = True # Ensure legacy tor flags in other mixins stay suppressed
+            
         self.timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         
         # Load Configuration

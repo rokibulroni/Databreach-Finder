@@ -4,6 +4,7 @@ import sqlite3
 import logging
 
 from ..common import console
+from ..constants import POSINT_CONFIG_DIR
 
 
 class DatabaseMixin:
@@ -27,6 +28,29 @@ class DatabaseMixin:
                 logging.error(f"Error loading config.json: {e}")
                 console.print(f"[bold red][!] Error loading config.json: {e}[/bold red]")
         return {}
+
+    def get_network_config(self):
+        config_path = os.path.join(POSINT_CONFIG_DIR, "network.json")
+        if os.path.exists(config_path):
+            try:
+                with open(config_path, 'r') as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return {"mode": "direct", "proxy_url": "", "wireguard_conf": ""}
+
+    def save_network_config(self, mode, proxy_url="", wireguard_conf=""):
+        config_path = os.path.join(POSINT_CONFIG_DIR, "network.json")
+        data = {
+            "mode": mode,
+            "proxy_url": proxy_url,
+            "wireguard_conf": wireguard_conf
+        }
+        try:
+            with open(config_path, 'w') as f:
+                json.dump(data, f, indent=4)
+        except Exception as e:
+            logging.error(f"Failed to save network config: {e}")
 
     def init_db(self):
         try:

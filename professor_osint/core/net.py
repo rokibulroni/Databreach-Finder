@@ -2,6 +2,7 @@ import time
 import random
 import asyncio
 from urllib.error import HTTPError
+import requests
 
 from googlesearch import search
 
@@ -10,6 +11,57 @@ from ..common import console
 
 class NetMixin:
     """Network resilience helpers: backoff, async DNS, concurrency limiting."""
+
+    def apply_network_config(self, cli_proxy=None, cli_wireguard=None):
+        """Merges CLI args with POSINT saved config."""
+        self.proxy_url = None
+        self.wireguard_conf = None
+        
+        # Load saved config
+        if hasattr(self, 'get_network_config'):
+            saved = self.get_network_config()
+            saved_mode = saved.get("mode", "direct")
+            if saved_mode == "tor":
+                self.proxy_url = "socks5://127.0.0.1:9050"
+            elif saved_mode == "proxy":
+                self.proxy_url = saved.get("proxy_url")
+            elif saved_mode == "wireguard":
+                self.wireguard_conf = saved.get("wireguard_conf")
+
+        # CLI overrides
+        if getattr(self, 'use_tor', False):
+            self.proxy_url = "socks5://127.0.0.1:9050"
+        if cli_proxy:
+            self.proxy_url = cli_proxy
+        if cli_wireguard:
+            self.wireguard_conf = cli_wireguard
+
+    def get_ip_info(self):
+        """Fetches the current public IP and metadata using the active proxy."""
+        proxies = None
+        if getattr(self, 'proxy_url', None):
+            proxies = {
+                "http": self.proxy_url,
+                "https": self.proxy_url
+            }
+        
+        try:
+            # We use ip-api.com as it returns clean JSON with ISP, Country, IP
+            resp = requests.get("http://ip-api.com/json/", proxies=proxies, timeout=10)
+            if resp.status_code == 200:
+                data = resp.json()
+                if data.get("status") == "success":
+                    return {
+                        "ip": data.get("query"),
+                        "country": data.get("country"),
+                        "isp": data.get("isp")
+                    }
+        except Exception as e:
+            console.print(f"[bold red][!] Network Error while checking IP: {e}[/bold red]")
+            import logging
+            logging.error(f"Failed to fetch IP info: {e}")
+        
+        return {"ip": "Unknown", "country": "Unknown", "isp": "Unknown"}
 
     def _search_with_backoff(self, advanced_query, num_results, max_retries=4):
         """Run googlesearch with exponential backoff + jitter on 429 rate limits."""
@@ -20,9 +72,10 @@ class NetMixin:
         # We must set os.environ so the underlying requests library picks it up.
         old_http = os.environ.get("HTTP_PROXY")
         old_https = os.environ.get("HTTPS_PROXY")
-        if getattr(self, 'use_tor', False):
-            os.environ["HTTP_PROXY"] = "socks5://127.0.0.1:9050"
-            os.environ["HTTPS_PROXY"] = "socks5://127.0.0.1:9050"
+        proxy_url = getattr(self, 'proxy_url', None)
+        if proxy_url:
+            os.environ["HTTP_PROXY"] = proxy_url
+            os.environ["HTTPS_PROXY"] = proxy_url
 
         try:
             for attempt in range(max_retries):
@@ -41,7 +94,7 @@ class NetMixin:
                     raise
             return []
         finally:
-            if getattr(self, 'use_tor', False):
+            if getattr(self, 'proxy_url', None):
                 if old_http is not None:
                     os.environ["HTTP_PROXY"] = old_http
                 else:
