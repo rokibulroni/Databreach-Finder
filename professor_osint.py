@@ -1327,93 +1327,112 @@ class ProfessorOSINT:
                     table.add_row(source, headline)
                     
                 console.print(table)
-                console.print(f"[bold red][!] WARNING: Target found in {len(self.news_results)} recent global reports![/bold red]")
+                   # Check if we actually have any data to save
+        has_data = any([
+            self.recommended_tools, self.playbook_commands, self.webcheck_results,
+            self.results, self.workspace_results, self.phone_results,
+            self.harvester_results.get('subdomains'), self.harvester_results.get('emails'),
+            self.spider_results, self.awesome_results, self.toolbox_results,
+            self.rustscan_results, self.social_results, self.news_results
+        ])
 
-        # Save to TXT
-        txt_filename = f'download_results_{self.timestamp}.txt'
-        with open(txt_filename, 'w', encoding='utf-8') as f:
-            if self.recommended_tools:
-                f.write("=== API ECOSYSTEM RECOMMENDATIONS ===\n")
-                for tool in self.recommended_tools:
-                    f.write(f"{tool['name']} -> {tool['url']}\n")
-                f.write("-" * 50 + "\n")
-            if self.playbook_commands:
-                f.write("=== TERMINAL PLAYBOOK ===\n")
-                for block in self.playbook_commands:
-                    for cmd in block['commands']:
-                        f.write(f"$ {cmd['command']}\n")
-                        f.write(f"  {cmd['explanation']}\n\n")
-                f.write("-" * 50 + "\n")
-            if self.webcheck_results:
-                f.write("=== WEB INFRASTRUCTURE ===\n")
-                f.write(f"Domain: {self.webcheck_results.get('domain')}\n")
-                f.write(f"IP: {self.webcheck_results.get('ip')}\n")
-                f.write(f"Location: {self.webcheck_results.get('location')}\n")
-                f.write(f"Hosting: {self.webcheck_results.get('isp')}\n")
-                f.write("-" * 50 + "\n")
-            if self.results:
-                f.write("\n=== DATABREACH FINDINGS ===\n")
-                for res in self.results:
-                    f.write(f"URL: {res['url']}\n")
-                    for item in res['data']:
-                        f.write(f"{item}\n")
+        if has_data:
+            txt_filename = f'download_results_{self.timestamp}.txt'
+            with open(txt_filename, 'w', encoding='utf-8') as f:
+                if self.recommended_tools:
+                    f.write("=== API ECOSYSTEM RECOMMENDATIONS ===\n")
+                    for tool in self.recommended_tools:
+                        f.write(f"{tool['name']} -> {tool['url']}\n")
                     f.write("-" * 50 + "\n")
-            if self.workspace_results:
-                f.write("\n=== ENTERPRISE WORKSPACE EXPOSURES ===\n")
-                for url in self.workspace_results:
-                    f.write(f"Asset: {url}\n")
-                f.write("-" * 50 + "\n")
-            if self.phone_results:
-                f.write("\n=== TELECOM INTELLIGENCE ===\n")
-                f.write(f"Format: {self.phone_results.get('international')}\n")
-                f.write(f"Validity: {self.phone_results.get('valid')}\n")
-                f.write(f"Location: {self.phone_results.get('location')}\n")
-                f.write(f"Carrier: {self.phone_results.get('carrier')}\n")
-                f.write("-" * 50 + "\n")
-            if self.harvester_results.get('subdomains') or self.harvester_results.get('emails'):
-                f.write("\n=== DOMAIN INTELLIGENCE ===\n")
-                for sub in self.harvester_results['subdomains']:
-                    f.write(f"Subdomain: {sub}\n")
-                for em in self.harvester_results['emails']:
-                    f.write(f"Email: {em}\n")
-                f.write("-" * 50 + "\n")
-            if self.spider_results:
-                f.write("\n=== ATTACK SURFACE MAPPING ===\n")
-                f.write(f"Resolved IP: {self.spider_results.get('resolved_ip')}\n")
-                f.write(f"Open Ports: {', '.join(map(str, self.spider_results.get('ports', [])))}\n")
-                f.write(f"Hostnames: {', '.join(self.spider_results.get('hostnames', []))}\n")
-                f.write(f"Tags: {', '.join(self.spider_results.get('tags', []))}\n")
-                f.write(f"Vulnerabilities: {', '.join(self.spider_results.get('vulns', []))}\n")
-                f.write("-" * 50 + "\n")
-            if self.awesome_results:
-                f.write("\n=== AWESOME HACKING TOOLKIT ===\n")
-                for repo in self.awesome_results:
-                    f.write(f"Repo: {repo['name']} (⭐ {repo['stars']})\n")
-                    f.write(f"URL: {repo['url']}\n")
-                    f.write(f"Description: {repo['description']}\n\n")
-                f.write("-" * 50 + "\n")
-            if self.toolbox_results:
-                f.write("\n=== THE PROFESSOR'S TOOLBOX ===\n")
-                for tool in self.toolbox_results:
-                    f.write(f"Tool: {tool['name']} ({tool['category']})\n")
-                    f.write(f"Description: {tool['desc']}\n")
-                    f.write(f"Install: {tool['install']}\n\n")
-                f.write("-" * 50 + "\n")
-            if self.rustscan_results:
-                f.write("\n=== ACTIVE PORT SCAN ENGINE ===\n")
-                f.write(f"Open Ports: {', '.join(map(str, self.rustscan_results))}\n")
-                f.write("-" * 50 + "\n")
-            if self.social_results:
-                f.write("\n=== TARGET DOSSIER ===\n")
-                for profile in self.social_results:
-                    f.write(f"{profile['platform']}: {profile['url']}\n")
-                    if profile.get('bio'): f.write(f"  Bio: {profile['bio']}\n")
-            if self.news_results:
-                f.write("\n=== LIVE THREAT INTELLIGENCE ===\n")
-                for source, headline in self.news_results:
-                    f.write(f"[{source}] {headline}\n")
-                    
-        console.print(f"[bold green][+] Full text results saved to {txt_filename}[/bold green]")
+                if self.playbook_commands:
+                    f.write("=== TERMINAL PLAYBOOK ===\n")
+                    for block in self.playbook_commands:
+                        for cmd in block['commands']:
+                            f.write(f"$ {cmd['command']}\n")
+                            f.write(f"  {cmd['explanation']}\n\n")
+                    f.write("-" * 50 + "\n")
+                if self.webcheck_results:
+                    f.write("=== WEB INFRASTRUCTURE ===\n")
+                    f.write(f"Domain: {self.webcheck_results.get('domain')}\n")
+                    f.write(f"IP: {self.webcheck_results.get('ip')}\n")
+                    f.write(f"Location: {self.webcheck_results.get('location')}\n")
+                    f.write(f"Hosting: {self.webcheck_results.get('isp')}\n")
+                    f.write("-" * 50 + "\n")
+                if self.results:
+                    f.write("\n=== DATABREACH FINDINGS ===\n")
+                    for res in self.results:
+                        f.write(f"URL: {res['url']}\n")
+                        for item in res['data']:
+                            f.write(f"{item}\n")
+                        f.write("-" * 50 + "\n")
+                if self.workspace_results:
+                    f.write("\n=== ENTERPRISE WORKSPACE EXPOSURES ===\n")
+                    for url in self.workspace_results:
+                        f.write(f"Asset: {url}\n")
+                    f.write("-" * 50 + "\n")
+                if self.phone_results:
+                    f.write("\n=== TELECOM INTELLIGENCE ===\n")
+                    f.write(f"Format: {self.phone_results.get('international')}\n")
+                    f.write(f"Validity: {self.phone_results.get('valid')}\n")
+                    f.write(f"Location: {self.phone_results.get('location')}\n")
+                    f.write(f"Carrier: {self.phone_results.get('carrier')}\n")
+                    f.write("-" * 50 + "\n")
+                if self.harvester_results.get('subdomains') or self.harvester_results.get('emails'):
+                    f.write("\n=== DOMAIN INTELLIGENCE ===\n")
+                    for sub in self.harvester_results['subdomains']:
+                        f.write(f"Subdomain: {sub}\n")
+                    for em in self.harvester_results['emails']:
+                        f.write(f"Email: {em}\n")
+                    f.write("-" * 50 + "\n")
+                if self.spider_results:
+                    f.write("\n=== ATTACK SURFACE MAPPING ===\n")
+                    f.write(f"Resolved IP: {self.spider_results.get('resolved_ip')}\n")
+                    f.write(f"Open Ports: {', '.join(map(str, self.spider_results.get('ports', [])))}\n")
+                    f.write(f"Hostnames: {', '.join(self.spider_results.get('hostnames', []))}\n")
+                    f.write(f"Tags: {', '.join(self.spider_results.get('tags', []))}\n")
+                    f.write(f"Vulnerabilities: {', '.join(self.spider_results.get('vulns', []))}\n")
+                    f.write("-" * 50 + "\n")
+                if self.awesome_results:
+                    f.write("\n=== AWESOME HACKING TOOLKIT ===\n")
+                    for repo in self.awesome_results:
+                        f.write(f"Repo: {repo['name']} (⭐ {repo['stars']})\n")
+                        f.write(f"URL: {repo['url']}\n")
+                        f.write(f"Description: {repo['description']}\n\n")
+                    f.write("-" * 50 + "\n")
+                if self.toolbox_results:
+                    f.write("\n=== THE PROFESSOR'S TOOLBOX ===\n")
+                    for tool in self.toolbox_results:
+                        f.write(f"Tool: {tool['name']} ({tool['category']})\n")
+                        f.write(f"Description: {tool['desc']}\n")
+                        f.write(f"Install: {tool['install']}\n\n")
+                    f.write("-" * 50 + "\n")
+                if self.rustscan_results:
+                    f.write("\n=== ACTIVE PORT SCAN ENGINE ===\n")
+                    f.write(f"Open Ports: {', '.join(map(str, self.rustscan_results))}\n")
+                    f.write("-" * 50 + "\n")
+                if self.social_results:
+                    f.write("\n=== TARGET DOSSIER ===\n")
+                    for profile in self.social_results:
+                        f.write(f"{profile['platform']}: {profile['url']}\n")
+                        if profile.get('bio'): f.write(f"  Bio: {profile['bio']}\n")
+                if self.news_results:
+                    f.write("\n=== LIVE THREAT INTELLIGENCE ===\n")
+                    for source, headline in self.news_results:
+                        f.write(f"[{source}] {headline}\n")
+                        
+            # Read and print the final report to the console in a nice panel
+            with open(txt_filename, 'r', encoding='utf-8') as f:
+                report_content = f.read().strip()
+                
+            if report_content:
+                console.print("\n")
+                console.print(Panel(report_content, title="[bold yellow]📑 Final OSINT Report[/bold yellow]", border_style="yellow", expand=False))
+                
+            console.print(f"[bold green][+] Full text results saved to {txt_filename}[/bold green]")
+            
+        elif not has_data:
+            # Do not print "saved to" if no data was found
+            pass
 
 
 def main():
