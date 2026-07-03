@@ -161,12 +161,14 @@ async def update_network_config(config: NetworkConfig):
 async def read_root():
     """Serves the main HTML dashboard for Professor OSINT."""
     try:
-        with open("templates/index.html", "r", encoding="utf-8") as f:
-            return f.read()
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        template_path = os.path.join(base_dir, "templates", "index.html")
+        with open(template_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        return HTMLResponse(content=content)
     except FileNotFoundError:
-        logger.error("templates/index.html not found.")
-        return "<h1>Error: Dashboard Template Not Found</h1><p>Ensure templates/index.html exists.</p>"
-
+        logger.error(f"{template_path} not found.")
+        return HTMLResponse(content="<h1>Error: Dashboard Template Not Found</h1><p>Ensure templates/index.html exists.</p>", status_code=404)
 
 @app.get("/report/{filename}", summary="Serve Generated Reports")
 async def get_report(filename: str):
