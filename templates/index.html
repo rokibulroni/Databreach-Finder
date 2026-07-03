@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professor OSINT | Enterprise Web Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/ansi_up@5.1.0/ansi_up.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --panel-bg: rgba(31, 40, 51, 0.6);
+            --accent: #66fcf1;
+            --accent-dim: #45a29e;
+            --text-main: #c5c6c7;
+            --text-bright: #ffffff;
+            --danger: #ff4c4c;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(102, 252, 241, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(69, 162, 158, 0.08) 0%, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(11, 12, 16, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        header h1 {
+            color: var(--text-bright);
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        header h1 span {
+            color: var(--accent);
+        }
+
+        main {
+            display: flex;
+            flex: 1;
+            padding: 30px 40px;
+            gap: 30px;
+            height: calc(100vh - 80px);
+        }
+
+        .config-panel {
+            flex: 0 0 350px;
+            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .config-section h3 {
+            color: var(--text-bright);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .input-group input[type="text"] {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-bright);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .input-group input[type="text"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(102, 252, 241, 0.2);
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        
+        .toggle-group span {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            transition: color 0.3s;
+        }
+
+        .toggle-group:hover span {
+            color: var(--text-bright);
+        }
+
+        /* Checkbox styling */
+        .toggle-group input[type="checkbox"] {
+            appearance: none;
+            width: 40px;
+            height: 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s;
+        }
+
+        .toggle-group input[type="checkbox"]::before {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--text-main);
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .toggle-group input[type="checkbox"]:checked {
+            background: rgba(102, 252, 241, 0.2);
+            border-color: var(--accent);
+        }
+
+        .toggle-group input[type="checkbox"]:checked::before {
+            left: 22px;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .btn-launch {
+            background: var(--accent-dim);
+            color: #000;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-launch::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: all 0.5s ease;
+        }
+
+        .btn-launch:hover {
+            background: var(--accent);
+            box-shadow: 0 0 15px rgba(102, 252, 241, 0.4);
+        }
+
+        .btn-launch:hover::after {
+            left: 100%;
+        }
+        
+        .btn-launch:disabled {
+            background: #333;
+            color: #777;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .terminal-container {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .terminal-header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .terminal-dots span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+        }
+        
+        .terminal-dots span:nth-child(2) { background: #ffbd2e; }
+        .terminal-dots span:nth-child(3) { background: #27c93f; }
+
+        .terminal-title {
+            margin-left: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        #terminal {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #ccc;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        #terminal::-webkit-scrollbar, .config-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #terminal::-webkit-scrollbar-track, .config-panel::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+        }
+        
+        #terminal::-webkit-scrollbar-thumb, .config-panel::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+
+        .report-overlay {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(11, 12, 16, 0.9);
+            border: 1px solid var(--accent);
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px rgba(102, 252, 241, 0.2);
+            animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .report-overlay h4 {
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        .btn-report {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-report:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        /* Connecting Animation */
+        .pulsating-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: auto;
+            box-shadow: 0 0 10px var(--accent);
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.4; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Professor <span>OSINT</span></h1>
+        <div id="status-indicator" style="margin-left:auto; display:none; align-items:center; gap:10px;">
+            <span style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:var(--accent);">Scan in progress</span>
+            <div class="pulsating-dot"></div>
+        </div>
+    </header>
+
+    <main>
+        <div class="config-panel">
+            <div class="config-section">
+                <h3>Target Information</h3>
+                <div class="input-group">
+                    <label for="query">Domain or Company (Query)</label>
+                    <input type="text" id="query" placeholder="e.g. scanme.nmap.org" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label for="username">Target Username</label>
+                    <input type="text" id="username" placeholder="e.g. rokibulroni" autocomplete="off">
+                </div>
+                <div class="input-group" id="socialXrayInput" style="display:none; margin-top:-5px;">
+                    <label for="social_xray_url" style="color:var(--accent);">Social X-Ray URL</label>
+                    <input type="text" id="social_xray_url" placeholder="https://youtube.com/..." autocomplete="off">
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Active Modules</h3>
+                
+                <label class="toggle-group">
+                    <span>Web-Check (Live Infra)</span>
+                    <input type="checkbox" id="webcheck" checked>
+                </label>
+                
+                <label class="toggle-group">
+                    <span>RustScan (Fast Ports)</span>
+                    <input type="checkbox" id="rustscan">
+                </label>
+                
+                <label class="toggle-group">
+                    <span>AI Threat Analysis</span>
+                    <input type="checkbox" id="ai_analyze">
+                </label>
+                
+                <label class="toggle-group">
+                    <span>Social X-Ray (Deep Scraping)</span>
+                    <input type="checkbox" id="social_xray">
+                </label>
+                
+                <label class="toggle-group">
+                    <span>Fetch Playbook (-p)</span>
+                    <input type="checkbox" id="playbook" checked>
+                </label>
+
+                <label class="toggle-group">
+                    <span>Fetch Recommendations (-r)</span>
+                    <input type="checkbox" id="recommend" checked>
+                </label>
+
+                <label class="toggle-group">
+                    <span style="color:var(--danger);">Use Tor Network (SOCKS5)</span>
+                    <input type="checkbox" id="tor">
+                </label>
+            </div>
+
+            <button id="launchBtn" class="btn-launch">Initialize Scan</button>
+        </div>
+
+        <div class="terminal-container">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <span></span><span></span><span></span>
+                </div>
+                <div class="terminal-title">professor-osint ~ terminal</div>
+            </div>
+            
+            <div id="terminal"></div>
+            
+            <div id="reportOverlay" class="report-overlay">
+                <h4>Scan Completed</h4>
+                <p style="font-size: 0.9rem;">The Professional HTML report has been generated successfully.</p>
+                <a id="reportLink" href="#" target="_blank" class="btn-report">View HTML Report</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const ansiUp = new AnsiUp();
+        
+        // Show/Hide Social X-Ray URL field
+        document.getElementById('social_xray').addEventListener('change', function(e) {
+            document.getElementById('socialXrayInput').style.display = e.target.checked ? 'flex' : 'none';
+        });
+
+        document.getElementById('launchBtn').addEventListener('click', function() {
+            const btn = this;
+            const terminal = document.getElementById('terminal');
+            const statusIndicator = document.getElementById('status-indicator');
+            const reportOverlay = document.getElementById('reportOverlay');
+            
+            // Build config payload
+            const config = {
+                query: document.getElementById('query').value.trim(),
+                username: document.getElementById('username').value.trim(),
+                webcheck: document.getElementById('webcheck').checked,
+                rustscan: document.getElementById('rustscan').checked,
+                ai_analyze: document.getElementById('ai_analyze').checked,
+                social_xray: document.getElementById('social_xray').checked,
+                social_xray_url: document.getElementById('social_xray_url').value.trim(),
+                playbook: document.getElementById('playbook').checked,
+                recommend: document.getElementById('recommend').checked,
+                tor: document.getElementById('tor').checked,
+            };
+            
+            if (!config.query && !config.username && !config.social_xray_url) {
+                alert("Please provide at least a Target Query, Username, or Social X-Ray URL.");
+                return;
+            }
+            
+            // Reset UI
+            terminal.innerHTML = '';
+            reportOverlay.style.display = 'none';
+            btn.disabled = true;
+            btn.innerText = 'Scan In Progress...';
+            statusIndicator.style.display = 'flex';
+            
+            // Connect WebSocket
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+            
+            ws.onopen = function() {
+                ws.send(JSON.stringify(config));
+            };
+            
+            ws.onmessage = function(event) {
+                const msg = JSON.parse(event.data);
+                
+                if (msg.type === 'log') {
+                    // Parse ANSI colors to HTML
+                    const html = ansiUp.ansi_to_html(msg.content);
+                    const div = document.createElement('div');
+                    div.innerHTML = html;
+                    terminal.appendChild(div);
+                    // Auto-scroll
+                    terminal.scrollTop = terminal.scrollHeight;
+                } 
+                else if (msg.type === 'report_ready') {
+                    const reportLink = document.getElementById('reportLink');
+                    reportLink.href = `/report/${msg.file}`;
+                    reportOverlay.style.display = 'flex';
+                }
+                else if (msg.type === 'done' || msg.type === 'error') {
+                    if (msg.type === 'error') {
+                        const div = document.createElement('div');
+                        div.style.color = '#ff4c4c';
+                        div.innerText = `\n[ERROR] ${msg.content}`;
+                        terminal.appendChild(div);
+                        terminal.scrollTop = terminal.scrollHeight;
+                    }
+                    
+                    btn.disabled = false;
+                    btn.innerText = 'Initialize Scan';
+                    statusIndicator.style.display = 'none';
+                }
+            };
+            
+            ws.onclose = function() {
+                btn.disabled = false;
+                btn.innerText = 'Initialize Scan';
+                statusIndicator.style.display = 'none';
+            };
+        });
+    </script>
+</body>
+</html>

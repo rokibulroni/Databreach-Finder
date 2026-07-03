@@ -191,12 +191,15 @@ class DiscoveryScannersMixin:
             target_category = CATEGORY_MAP[self.extract_type]
         elif self.username:
             target_category = CATEGORY_MAP['username']
+        elif self.query:
+            target_category = CATEGORY_MAP['ipv4']
             
         if not target_category:
             return
             
         try:
-            async with session.get(OSINT_API_URL, timeout=10) as response:
+            headers = {'User-Agent': random.choice(USER_AGENTS)}
+            async with session.get(OSINT_API_URL, headers=headers, timeout=10) as response:
                 if response.status == 200:
                     data = await response.json()
                     # Find category in children
@@ -224,7 +227,8 @@ class DiscoveryScannersMixin:
             target_ip_domain = self.username
             
         try:
-            async with session.get(api_endpoint, timeout=10) as response:
+            headers = {'User-Agent': random.choice(USER_AGENTS)}
+            async with session.get(api_endpoint, headers=headers, timeout=10) as response:
                 if response.status == 200:
                     data = await response.json()
                     self.playbook_commands.append({"tool": data.get("tool", "Terminal"), "commands": []})

@@ -5,3 +5,6 @@ rich
 aiohttp
 aiohttp-socks
 python-dotenv
+fastapi
+uvicorn
+websockets

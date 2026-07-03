@@ -190,7 +190,6 @@ class ProfessorOSINT(
 
         connector = None
         if self.use_tor:
-            console.print("[bold yellow][!] Configuring Tor Network Routing (SOCKS5)...[/bold yellow]")
             connector = ProxyConnector.from_url('socks5://127.0.0.1:9050')
 
         timeout = aiohttp.ClientTimeout(total=30)

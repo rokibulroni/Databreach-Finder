@@ -1,0 +1,234 @@
+import os
+import re
+import json
+import logging
+import asyncio
+from typing import Optional
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+
+# ---------------------------------------------------------
+# Configuration & Logging Setup
+# ---------------------------------------------------------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s - %(message)s"
+)
+logger = logging.getLogger("professor_osint.web")
+
+# ---------------------------------------------------------
+# Pydantic Schema for Scan Configuration
+# ---------------------------------------------------------
+class ScanConfig(BaseModel):
+    query: Optional[str] = Field(default="", description="Target Domain or Company")
+    username: Optional[str] = Field(default="", description="Target Username")
+    extract: Optional[str] = Field(default="", description="Specific extraction type (emails, ipv4, etc.)")
+    
+    social_xray_url: Optional[str] = Field(default="", description="Target URL for Social X-Ray")
+    
+    # Toggle Modules
+    tor: bool = False
+    ai_analyze: bool = False
+    social_xray: bool = False
+    rustscan: bool = False
+    harvester: bool = False
+    spider: bool = False
+    monitor: bool = False
+    dossier: bool = False
+    webcheck: bool = False
+    analyzer: bool = False
+    workspace: bool = False
+    phone: bool = False
+    awesome: bool = False
+    recommend: bool = False
+    playbook: bool = False
+
+# ---------------------------------------------------------
+# FastAPI App Initialization
+# ---------------------------------------------------------
+app = FastAPI(
+    title="Professor OSINT Web UI",
+    description="Enterprise OSINT Intelligence Gathering via WebSockets",
+    version="7.0"
+)
+
+# Add CORS Middleware for cross-origin if needed
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+os.makedirs("templates", exist_ok=True)
+
+# ---------------------------------------------------------
+# HTTP Routes
+# ---------------------------------------------------------
+@app.get("/", response_class=HTMLResponse, summary="Serve Web Dashboard")
+async def read_root():
+    """Serves the main HTML dashboard for Professor OSINT."""
+    try:
+        with open("templates/index.html", "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        logger.error("templates/index.html not found.")
+        return "<h1>Error: Dashboard Template Not Found</h1><p>Ensure templates/index.html exists.</p>"
+
+
+@app.get("/report/{filename}", summary="Serve Generated Reports")
+async def get_report(filename: str):
+    """Serve the final generated professional HTML report."""
+    # Prevent directory traversal attacks
+    filename = os.path.basename(filename)
+    
+    if not filename.endswith(".html"):
+        return {"error": "Invalid file type. Only .html reports are allowed."}
+        
+    if os.path.exists(filename):
+        return FileResponse(filename)
+        
+    logger.warning(f"Report requested but not found: {filename}")
+    return {"error": "Report not found on the server."}
+
+# ---------------------------------------------------------
+# WebSocket Endpoint (Real-Time Scan Execution)
+# ---------------------------------------------------------
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    process = None
+    
+    try:
+        data = await websocket.receive_text()
+        
+        # Validate incoming data with Pydantic
+        try:
+            raw_config = json.loads(data)
+            config = ScanConfig(**raw_config)
+        except Exception as e:
+            logger.error(f"Invalid configuration received: {e}")
+            await websocket.send_text(json.dumps({"type": "error", "content": f"Invalid config: {e}"}))
+            await websocket.close()
+            return
+            
+        logger.info(f"Starting scan with config: {config.model_dump_json()}")
+        
+        # Build the OSINT command
+        cmd = ["python", "professor_osint.py"]
+        
+        if config.query.strip():
+            cmd.extend(["-q", config.query.strip()])
+        if config.username.strip():
+            cmd.extend(["-u", config.username.strip()])
+        if config.extract.strip():
+            cmd.extend(["-e", config.extract.strip()])
+            
+        # Map Pydantic fields to CLI flags
+        flags_map = {
+            "tor": "--tor",
+            "ai_analyze": "--ai-analyze",
+            "rustscan": "--rustscan",
+            "harvester": "--harvester",
+            "spider": "--spider",
+            "monitor": "-m",
+            "dossier": "-x",
+            "webcheck": "-w",
+            "analyzer": "-a",
+            "workspace": "--workspace",
+            "phone": "--phone",
+            "awesome": "--awesome",
+            "recommend": "-r",
+            "playbook": "-p"
+        }
+        
+        for field, flag in flags_map.items():
+            if getattr(config, field):
+                cmd.append(flag)
+                
+        # Handle Social X-Ray specifically because it requires a URL
+        if config.social_xray:
+            if config.social_xray_url.strip():
+                cmd.extend(["--social-xray", config.social_xray_url.strip()])
+            else:
+                logger.warning("Social X-Ray enabled but no URL provided. Skipping flag.")
+                
+        # Force HTML report generation so we can serve it back to the UI
+        cmd.extend(["--report", "html"])
+        
+        # Set environment variable to force Rich to output ANSI color codes via pipes
+        env = os.environ.copy()
+        env["FORCE_COLOR"] = "1"
+        
+        # Spawn the scanning engine as an asynchronous subprocess
+        process = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
+            env=env
+        )
+        
+        logger.info(f"Subprocess spawned with PID: {process.pid}")
+        report_pattern = re.compile(r"Professional HTML report saved to (report_.*\.html)")
+        
+        # Stream stdout line-by-line to the WebSocket
+        while True:
+            line = await process.stdout.readline()
+            if not line:
+                break
+                
+            decoded_line = line.decode('utf-8', errors='replace')
+            await websocket.send_text(json.dumps({
+                "type": "log",
+                "content": decoded_line
+            }))
+            
+            # Check if a report was successfully generated
+            match = report_pattern.search(decoded_line)
+            if match:
+                report_file = match.group(1)
+                await websocket.send_text(json.dumps({
+                    "type": "report_ready",
+                    "file": report_file
+                }))
+                
+        # Wait for graceful termination
+        await process.wait()
+        logger.info(f"Subprocess {process.pid} finished with exit code {process.returncode}")
+        
+        await websocket.send_text(json.dumps({
+            "type": "done",
+            "content": f"Scan completed with exit code {process.returncode}"
+        }))
+        
+    except WebSocketDisconnect:
+        logger.warning("Client disconnected prematurely.")
+        # If the client disconnects, we MUST kill the OSINT scan to prevent ghost processes
+        if process and process.returncode is None:
+            logger.info(f"Terminating orphaned subprocess PID {process.pid}")
+            try:
+                process.terminate()
+                # Give it a moment to terminate gracefully, then kill
+                await asyncio.sleep(1)
+                if process.returncode is None:
+                    process.kill()
+            except ProcessLookupError:
+                pass
+                
+    except Exception as e:
+        logger.error(f"WebSocket error: {e}", exc_info=True)
+        try:
+            await websocket.send_text(json.dumps({
+                "type": "error",
+                "content": str(e)
+            }))
+        except:
+            pass
+
+if __name__ == "__main__":
+    import uvicorn
+    logger.info("Starting Professor OSINT Web Server...")
+    uvicorn.run("web_app:app", host="127.0.0.1", port=8000, reload=True)

@@ -13,22 +13,43 @@ class NetMixin:
 
     def _search_with_backoff(self, advanced_query, num_results, max_retries=4):
         """Run googlesearch with exponential backoff + jitter on 429 rate limits."""
+        import os
         delay = 2.0
-        for attempt in range(max_retries):
-            try:
-                return list(search(advanced_query, num_results=num_results, lang="en"))
-            except HTTPError as e:
-                if e.code == 429 and attempt < max_retries - 1:
-                    sleep_for = delay + random.uniform(0, 1.5)
-                    console.print(
-                        f"[bold yellow][!] Google 429 rate limit — backing off "
-                        f"{sleep_for:.1f}s (attempt {attempt + 1}/{max_retries})...[/bold yellow]"
-                    )
-                    time.sleep(sleep_for)
-                    delay *= 2
-                    continue
-                raise
-        return []
+        
+        # googlesearch-python explicitly drops 'socks5://' from its proxy kwarg. 
+        # We must set os.environ so the underlying requests library picks it up.
+        old_http = os.environ.get("HTTP_PROXY")
+        old_https = os.environ.get("HTTPS_PROXY")
+        if getattr(self, 'use_tor', False):
+            os.environ["HTTP_PROXY"] = "socks5://127.0.0.1:9050"
+            os.environ["HTTPS_PROXY"] = "socks5://127.0.0.1:9050"
+
+        try:
+            for attempt in range(max_retries):
+                try:
+                    return list(search(advanced_query, num_results=num_results, lang="en"))
+                except HTTPError as e:
+                    if e.code == 429 and attempt < max_retries - 1:
+                        sleep_for = delay + random.uniform(0, 1.5)
+                        console.print(
+                            f"[bold yellow][!] Google 429 rate limit — backing off "
+                            f"{sleep_for:.1f}s (attempt {attempt + 1}/{max_retries})...[/bold yellow]"
+                        )
+                        time.sleep(sleep_for)
+                        delay *= 2
+                        continue
+                    raise
+            return []
+        finally:
+            if getattr(self, 'use_tor', False):
+                if old_http is not None:
+                    os.environ["HTTP_PROXY"] = old_http
+                else:
+                    os.environ.pop("HTTP_PROXY", None)
+                if old_https is not None:
+                    os.environ["HTTPS_PROXY"] = old_https
+                else:
+                    os.environ.pop("HTTPS_PROXY", None)
 
     async def _throttle(self, name, per_minute):
         """Space out calls to a named rate-limited API (e.g. VirusTotal: 4/min).
