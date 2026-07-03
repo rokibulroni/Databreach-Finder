@@ -15,6 +15,36 @@
             --text-main: #c5c6c7;
             --text-bright: #ffffff;
             --danger: #ff4c4c;
+            --header-bg: rgba(11, 12, 16, 0.8);
+            --border-color: rgba(255, 255, 255, 0.05);
+            --border-strong: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(0,0,0,0.4);
+            --element-bg: rgba(0,0,0,0.5);
+            --modal-bg: #1f2833;
+            --shadow: rgba(0,0,0,0.5);
+            --overlay: rgba(0,0,0,0.8);
+            --disabled-bg: #333;
+            --disabled-text: #777;
+        }
+
+        :root[data-theme="light"] {
+            --bg-color: #f4f6f8;
+            --panel-bg: rgba(255, 255, 255, 0.8);
+            --accent: #007aff;
+            --accent-dim: #005bb5;
+            --text-main: #4a4a4a;
+            --text-bright: #111111;
+            --danger: #dc3545;
+            --header-bg: rgba(255, 255, 255, 0.9);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --border-strong: rgba(0, 0, 0, 0.2);
+            --input-bg: rgba(0, 0, 0, 0.03);
+            --element-bg: rgba(0, 0, 0, 0.08);
+            --modal-bg: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --overlay: rgba(255, 255, 255, 0.7);
+            --disabled-bg: #e0e0e0;
+            --disabled-text: #999;
         }
         
         * {
@@ -27,8 +57,8 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(circle at 15% 50%, rgba(102, 252, 241, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(69, 162, 158, 0.08) 0%, transparent 50%);
+                radial-gradient(circle at 15% 50%, color-mix(in srgb, var(--accent) 5%, transparent) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--accent-dim) 8%, transparent) 0%, transparent 50%);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -39,8 +69,8 @@
             padding: 20px 40px;
             display: flex;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(11, 12, 16, 0.8);
+            border-bottom: 1px solid var(--border-color);
+            background: var(--header-bg);
             backdrop-filter: blur(10px);
             position: sticky;
             top: 0;
@@ -59,9 +89,27 @@
             color: var(--accent);
         }
 
-        .network-badge {
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-strong);
+            color: var(--text-main);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
             margin-left: auto;
-            background: rgba(102, 252, 241, 0.1);
+            margin-right: 15px;
+            transition: all 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--element-bg);
+            border-color: var(--accent);
+        }
+
+        .network-badge {
+            margin-left: 0;
+            background: color-mix(in srgb, var(--accent) 10%, transparent);
             border: 1px solid var(--accent-dim);
             padding: 8px 15px;
             border-radius: 20px;
@@ -74,7 +122,7 @@
         }
 
         .network-badge:hover {
-            background: rgba(102, 252, 241, 0.2);
+            background: color-mix(in srgb, var(--accent) 20%, transparent);
         }
 
         .network-badge .indicator {
@@ -103,13 +151,13 @@
             background: var(--panel-bg);
             border-radius: 12px;
             padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
             backdrop-filter: blur(12px);
             display: flex;
             flex-direction: column;
             gap: 20px;
             overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px var(--shadow);
         }
 
         .config-section h3 {
@@ -119,7 +167,7 @@
             letter-spacing: 1.5px;
             margin-bottom: 15px;
             padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid var(--border-strong);
         }
 
         .input-group {
@@ -135,9 +183,9 @@
             font-weight: 600;
         }
 
-        .input-group input[type="text"] {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.1);
+        .input-group input[type="text"], .input-group select {
+            background: var(--input-bg);
+            border: 1px solid var(--border-strong);
             color: var(--text-bright);
             padding: 10px 12px;
             border-radius: 6px;
@@ -147,9 +195,9 @@
             outline: none;
         }
 
-        .input-group input[type="text"]:focus {
+        .input-group input[type="text"]:focus, .input-group select:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(102, 252, 241, 0.2);
+            box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 20%, transparent);
         }
 
         .toggle-group {
@@ -171,17 +219,16 @@
             color: var(--text-bright);
         }
 
-        /* Checkbox styling */
         .toggle-group input[type="checkbox"] {
             appearance: none;
             width: 40px;
             height: 20px;
-            background: rgba(0,0,0,0.5);
+            background: var(--element-bg);
             border-radius: 20px;
             position: relative;
             cursor: pointer;
             outline: none;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid var(--border-strong);
             transition: all 0.3s;
         }
 
@@ -198,7 +245,7 @@
         }
 
         .toggle-group input[type="checkbox"]:checked {
-            background: rgba(102, 252, 241, 0.2);
+            background: color-mix(in srgb, var(--accent) 20%, transparent);
             border-color: var(--accent);
         }
 
@@ -244,16 +291,16 @@
         }
         
         .btn-launch:disabled {
-            background: #333;
-            color: #777;
+            background: var(--disabled-bg);
+            color: var(--disabled-text);
             cursor: not-allowed;
             box-shadow: none;
         }
 
         .terminal-container {
             flex: 1;
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: #0b0c10; /* Keep terminal dark */
+            border: 1px solid var(--border-color);
             border-radius: 12px;
             display: flex;
             flex-direction: column;
@@ -263,7 +310,7 @@
         }
 
         .terminal-header {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.5);
             padding: 10px 20px;
             display: flex;
             align-items: center;
@@ -309,11 +356,11 @@
         }
         
         #terminal::-webkit-scrollbar-track, .config-panel::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.2);
+            background: var(--element-bg);
         }
         
         .terminal-panel::-webkit-scrollbar-thumb, .config-panel::-webkit-scrollbar-thumb {
-            background: rgba(102, 252, 241, 0.2);
+            background: color-mix(in srgb, var(--accent) 30%, transparent);
             border-radius: 4px;
         }
 
@@ -321,7 +368,7 @@
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
+            background: var(--overlay);
             backdrop-filter: blur(5px);
             display: none;
             justify-content: center;
@@ -329,22 +376,23 @@
             z-index: 100;
         }
         .modal {
-            background: #1f2833;
-            border: 1px solid var(--accent-dim);
+            background: var(--modal-bg);
+            border: 1px solid var(--border-strong);
             border-radius: 12px;
             padding: 30px;
             width: 450px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 50px var(--shadow);
+            color: var(--text-main);
         }
         .modal h2 { margin-bottom: 20px; color: var(--accent); }
         .modal .form-group { margin-bottom: 15px; }
-        .modal .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; }
+        .modal .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: var(--text-bright); }
         .modal .form-group input, .modal .form-group select, .modal .form-group textarea {
             width: 100%;
             padding: 10px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
+            background: var(--input-bg);
+            border: 1px solid var(--border-strong);
+            color: var(--text-bright);
             border-radius: 6px;
         }
         .modal .form-group textarea { height: 100px; resize: vertical; font-family: monospace; }
@@ -357,7 +405,7 @@
             position: absolute;
             bottom: 30px;
             right: 30px;
-            background: rgba(11, 12, 16, 0.9);
+            background: var(--header-bg);
             border: 1px solid var(--accent);
             padding: 20px;
             border-radius: 8px;
@@ -365,7 +413,7 @@
             flex-direction: column;
             gap: 15px;
             align-items: flex-start;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px rgba(102, 252, 241, 0.2);
+            box-shadow: 0 10px 30px var(--shadow), 0 0 15px color-mix(in srgb, var(--accent) 20%, transparent);
             animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
@@ -418,6 +466,9 @@
 
     <header>
         <h1>Professor<span>OSINT</span></h1>
+        <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+            🌓
+        </button>
         <div class="network-badge" id="networkBadge" onclick="openNetworkModal()">
             <div class="indicator"></div>
             <span id="networkText">Checking IP...</span>
@@ -550,6 +601,28 @@
     </div>
 
     <script>
+        // Theme Management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('professor_osint_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
+        }
+        initTheme();
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            if (newTheme === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('professor_osint_theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('professor_osint_theme', 'light');
+            }
+        }
+
         const ansiUp = new AnsiUp();
         
         // Show/Hide Social X-Ray URL field
