@@ -4,14 +4,21 @@ Extends Professor OSINT beyond username footprinting (which only checks whether
 an account exists) into deep extraction of public posts, comments, and metadata
 from a specific social media link.
 
-v1 targets the two highest-reliability, lowest-maintenance public sources:
+Stable v1 sources (highest reliability, lowest maintenance):
   * YouTube — via the ``yt-dlp`` library (metadata + public comments).
   * Reddit  — via the anonymous ``.json`` endpoint (threads + subreddits).
 
-Heavier headless-browser platforms (Facebook / LinkedIn / Instagram / X) are
-intentionally deferred; see ``docs/SOCIAL-MEDIA-DEEP.md`` for the full blueprint
-and the authorized-use / legal boundary this module enforces.
+Experimental sources (best-effort, opt-in, may break as platforms change):
+  * Instagram — via ``instaloader`` using a user-supplied session id. Anonymous
+    access is largely non-functional today, so a session is the primary path.
+  * Facebook  — via headless ``Playwright`` Chromium (auto-scroll + DOM parse).
+
+See ``docs/SOCIAL-MEDIA-DEEP.md`` for the full blueprint and the authorized-use /
+legal boundary this module enforces. The heavy extraction deps (yt-dlp,
+instaloader, playwright) ship as the optional ``[social]`` extra and are lazily
+imported so the core install stays light.
 """
+import os
 import re
 import random
 import datetime
@@ -24,6 +31,10 @@ from rich.panel import Panel
 
 from ..common import console
 from ..constants import USER_AGENTS
+
+# Platforms whose extraction is opt-in and best-effort — the user gets an extra
+# heads-up before we engage them.
+EXPERIMENTAL_PLATFORMS = {"instagram", "facebook"}
 
 
 class SocialXrayMixin:
@@ -79,6 +90,10 @@ class SocialXrayMixin:
             return "youtube"
         if re.search(r"reddit\.com", u):
             return "reddit"
+        if re.search(r"instagram\.com", u):
+            return "instagram"
+        if re.search(r"(?:facebook\.com|fb\.com|fb\.watch)", u):
+            return "facebook"
         return None
 
     @staticmethod
@@ -114,21 +129,32 @@ class SocialXrayMixin:
         platform = self._detect_platform(self.social_xray)
         if platform is None:
             console.print(
-                "[bold red][!] Unsupported target. Social X-Ray v1 supports YouTube "
-                "and Reddit links only.[/bold red]"
+                "[bold red][!] Unsupported target. Social X-Ray supports YouTube and "
+                "Reddit (stable) plus Instagram and Facebook (experimental) links.[/bold red]"
             )
             return
+
+        if platform in EXPERIMENTAL_PLATFORMS:
+            console.print(
+                f"[bold yellow][~] {platform.capitalize()} extraction is EXPERIMENTAL — "
+                "it depends on the optional [white][social][/white] extra and may break "
+                "as the platform changes. Best-effort only.[/bold yellow]"
+            )
 
         console.print(
             f"[bold cyan]🛰️  Social X-Ray engaging {platform.capitalize()} target "
             f"(limit {self.limit}, comments {'ON' if self.extract_comments else 'OFF'})...[/bold cyan]"
         )
 
+        # Dispatch to the platform-specific extractor.
+        extractors = {
+            "reddit": self._scan_reddit,
+            "youtube": self._scan_youtube,
+            "instagram": self._scan_instagram,
+            "facebook": self._scan_facebook,
+        }
         try:
-            if platform == "reddit":
-                result = await self._scan_reddit(self.social_xray)
-            else:
-                result = await self._scan_youtube(self.social_xray)
+            result = await extractors[platform](self.social_xray)
         except Exception as exc:  # never let a scraper failure crash the run
             logging.error("Social X-Ray failed for %s: %s", self.social_xray, exc)
             console.print(f"[bold red][!] Social X-Ray extraction error: {exc}[/bold red]")
@@ -333,6 +359,284 @@ class SocialXrayMixin:
         except Exception as exc:
             logging.error("yt-dlp extraction failed for %s: %s", url, exc)
             return None
+
+    # ---- Instagram (instaloader, session-based) — EXPERIMENTAL --------
+
+    @staticmethod
+    def _instagram_shortcode(url):
+        """Return the post/reel shortcode from an Instagram URL, or None."""
+        m = re.search(r"instagram\.com/(?:p|reel|tv)/([A-Za-z0-9_-]+)", url or "")
+        return m.group(1) if m else None
+
+    @staticmethod
+    def _instagram_username(url):
+        """Return a profile username from an Instagram URL, or None."""
+        m = re.search(r"instagram\.com/([A-Za-z0-9_.]+)/?", url or "")
+        if not m:
+            return None
+        handle = m.group(1)
+        # Filter out non-profile path segments.
+        if handle.lower() in {"p", "reel", "tv", "explore", "stories", "accounts"}:
+            return None
+        return handle
+
+    async def _scan_instagram(self, url):
+        """Extract an Instagram post or profile using a user-supplied session.
+
+        Instagram blocks anonymous scraping aggressively, so the primary path is
+        a logged-in session: set ``INSTAGRAM_SESSIONID`` (and ideally
+        ``INSTAGRAM_USERNAME``) in your environment / .env. Using a session
+        carries account-ban risk — use a throwaway/research account.
+        """
+        try:
+            import instaloader  # lazy import — part of the optional ``social`` extra
+        except ImportError:
+            console.print(
+                "[bold yellow][!] instaloader is not installed. Install the social extra:\n"
+                "    pip install 'professor-osint\\[social]'   (or: pip install instaloader)[/bold yellow]"
+            )
+            return None
+
+        sessionid = os.getenv("INSTAGRAM_SESSIONID")
+        session_user = os.getenv("INSTAGRAM_USERNAME")
+        if not sessionid:
+            console.print(
+                "[bold yellow][!] No INSTAGRAM_SESSIONID set. Anonymous Instagram access is "
+                "largely blocked; set a session id in your .env (see docs) for reliable "
+                "results. Attempting anonymous best-effort...[/bold yellow]"
+            )
+
+        # instaloader is fully blocking — run the whole job in a worker thread.
+        return await asyncio.to_thread(
+            self._instagram_extract, instaloader, url, sessionid, session_user
+        )
+
+    def _instagram_extract(self, instaloader, url, sessionid, session_user):
+        """Blocking instaloader routine (posts or profiles). Returns a result dict."""
+        L = instaloader.Instaloader(
+            quiet=True, download_pictures=False, download_videos=False,
+            download_comments=False, save_metadata=False, compress_json=False,
+        )
+
+        # Authenticate with the raw session cookie when provided.
+        if sessionid:
+            try:
+                L.context._session.cookies.set(
+                    "sessionid", sessionid, domain=".instagram.com"
+                )
+                verified = L.test_login()
+                if verified:
+                    L.context.username = verified
+                    console.print(f"[bold green][+] Instagram session valid (as {verified}).[/bold green]")
+                else:
+                    console.print("[bold yellow][!] Instagram session id was rejected; continuing anonymously.[/bold yellow]")
+            except Exception as exc:
+                logging.error("Instagram session load failed: %s", exc)
+                console.print("[bold yellow][!] Could not apply Instagram session; continuing anonymously.[/bold yellow]")
+
+        shortcode = self._instagram_shortcode(url)
+        try:
+            if shortcode:
+                return self._instagram_post(instaloader, L, url, shortcode)
+            username = self._instagram_username(url)
+            if username:
+                return self._instagram_profile(instaloader, L, url, username)
+        except Exception as exc:
+            logging.error("Instagram extraction failed for %s: %s", url, exc)
+            console.print(f"[bold red][!] Instagram extraction error: {exc}[/bold red]")
+            return None
+
+        console.print("[bold red][!] Could not parse an Instagram post or profile from that URL.[/bold red]")
+        return None
+
+    def _instagram_post(self, instaloader, L, url, shortcode):
+        post = instaloader.Post.from_shortcode(L.context, shortcode)
+        caption = (post.caption or "").strip()
+        hashtags = " ".join(f"#{h}" for h in (post.caption_hashtags or []))
+        location = getattr(post, "location", None)
+        loc_name = location.name if location else None
+        header = caption
+        if hashtags:
+            header = f"{header}\n{hashtags}".strip()
+        if loc_name:
+            header = f"{header}\n📍 {loc_name}".strip()
+
+        entries = [{
+            "type": "post",
+            "author": post.owner_username,
+            "timestamp": post.date_utc.strftime("%Y-%m-%d %H:%M UTC") if post.date_utc else "Unknown",
+            "text": header[:2000],
+            "engagement": f"{post.likes} likes / {post.comments} comments",
+        }]
+
+        if self.extract_comments:
+            try:
+                for c in post.get_comments():
+                    if len(entries) > self.limit:
+                        break
+                    text = (c.text or "").strip()
+                    if not text:
+                        continue
+                    entries.append({
+                        "type": "comment",
+                        "author": getattr(c.owner, "username", None),
+                        "timestamp": c.created_at_utc.strftime("%Y-%m-%d %H:%M UTC") if getattr(c, "created_at_utc", None) else "Unknown",
+                        "text": text,
+                        "engagement": f"{getattr(c, 'likes_count', 0)} likes",
+                    })
+            except Exception as exc:
+                logging.error("Instagram comment fetch failed (%s): %s", shortcode, exc)
+                console.print("[bold yellow][!] Could not fetch Instagram comments (session/limit); keeping post data.[/bold yellow]")
+
+        return {
+            "platform": "Instagram",
+            "url": url,
+            "title": f"Post by @{post.owner_username}",
+            "author": post.owner_username,
+            "timestamp": entries[0]["timestamp"],
+            "entries": entries[: self.limit + 1],
+        }
+
+    def _instagram_profile(self, instaloader, L, url, username):
+        profile = instaloader.Profile.from_username(L.context, username)
+        entries = [{
+            "type": "profile",
+            "author": profile.username,
+            "timestamp": "Unknown",
+            "text": (
+                f"{profile.full_name or ''}\n{(profile.biography or '').strip()}"
+            ).strip()[:2000],
+            "engagement": f"{profile.followers} followers / {profile.followees} following / {profile.mediacount} posts",
+        }]
+
+        try:
+            for post in profile.get_posts():
+                if len(entries) > self.limit:
+                    break
+                caption = (post.caption or "").strip().replace("\n", " ")
+                entries.append({
+                    "type": "post",
+                    "author": profile.username,
+                    "timestamp": post.date_utc.strftime("%Y-%m-%d %H:%M UTC") if post.date_utc else "Unknown",
+                    "text": caption[:500] or f"[media] {post.shortcode}",
+                    "engagement": f"{post.likes} likes / {post.comments} comments",
+                })
+        except Exception as exc:
+            logging.error("Instagram profile posts failed (%s): %s", username, exc)
+            console.print("[bold yellow][!] Could not list profile posts (private/session); keeping bio.[/bold yellow]")
+
+        return {
+            "platform": "Instagram",
+            "url": url,
+            "title": f"Profile @{profile.username}",
+            "author": profile.username,
+            "timestamp": "Unknown",
+            "entries": entries[: self.limit + 1],
+        }
+
+    # ---- Facebook (Playwright headless Chromium) — EXPERIMENTAL -------
+
+    async def _scan_facebook(self, url):
+        """Best-effort public Facebook extraction via headless Chromium.
+
+        Facebook blocks aggressively and hides content behind login walls, so
+        this is best-effort: it loads the public URL, auto-scrolls to trigger
+        lazy loading, and parses visible ``role=article`` blocks. Requires
+        ``playwright`` plus a one-time ``playwright install chromium``.
+        """
+        try:
+            from playwright.async_api import async_playwright  # lazy — ``social`` extra
+        except ImportError:
+            console.print(
+                "[bold yellow][!] playwright is not installed. Install the social extra and the browser:\n"
+                "    pip install 'professor-osint\\[social]'\n"
+                "    playwright install chromium[/bold yellow]"
+            )
+            return None
+
+        entries = []
+        try:
+            async with async_playwright() as pw:
+                try:
+                    browser = await pw.chromium.launch(headless=True)
+                except Exception as exc:
+                    logging.error("Playwright chromium launch failed: %s", exc)
+                    console.print(
+                        "[bold yellow][!] Could not launch Chromium. Run "
+                        "[white]playwright install chromium[/white] first.[/bold yellow]"
+                    )
+                    return None
+
+                context = await browser.new_context(
+                    user_agent=random.choice(USER_AGENTS),
+                    locale="en-US",
+                    viewport={"width": 1280, "height": 900},
+                    proxy={"server": "socks5://127.0.0.1:9050"} if self.use_tor else None,
+                )
+                page = await context.new_page()
+                await page.goto(url, wait_until="domcontentloaded", timeout=45000)
+                await asyncio.sleep(random.uniform(2.0, 4.0))
+
+                # Dismiss the most common cookie/login dialogs when present.
+                for label in ("Allow all cookies", "Only allow essential cookies", "Decline optional cookies"):
+                    try:
+                        btn = page.get_by_role("button", name=label)
+                        if await btn.count():
+                            await btn.first.click(timeout=2500)
+                            break
+                    except Exception:
+                        pass
+
+                # Soft-block / login-wall detection.
+                content_sample = (await page.content())[:5000].lower()
+                if "you must log in to continue" in content_sample or "log into facebook" in content_sample:
+                    console.print(
+                        "[bold yellow][!] Facebook served a login wall — public extraction blocked "
+                        "for this target. Try a public Page/post URL.[/bold yellow]"
+                    )
+
+                # Auto-scroll with randomized delays to trigger lazy loading.
+                title = await page.title()
+                seen = set()
+                scrolls = max(3, min(12, self.limit // 5))
+                for _ in range(scrolls):
+                    articles = await page.locator('div[role="article"]').all_inner_texts()
+                    for raw in articles:
+                        text = " ".join((raw or "").split())
+                        if not text or text in seen:
+                            continue
+                        seen.add(text)
+                        entries.append({
+                            "type": "post",
+                            "author": None,  # FB obfuscates DOM; author left anonymous
+                            "timestamp": "Unknown",
+                            "text": text[:1500],
+                            "engagement": "",
+                        })
+                        if len(entries) >= self.limit:
+                            break
+                    if len(entries) >= self.limit:
+                        break
+                    await page.mouse.wheel(0, random.randint(1500, 2600))
+                    await asyncio.sleep(random.uniform(1.5, 3.0))
+
+                await context.close()
+                await browser.close()
+        except Exception as exc:
+            logging.error("Facebook extraction failed for %s: %s", url, exc)
+            console.print(f"[bold red][!] Facebook extraction error: {exc}[/bold red]")
+            return None
+
+        if not entries:
+            return None
+        return {
+            "platform": "Facebook",
+            "url": url,
+            "title": title or "Facebook target",
+            "author": None,
+            "timestamp": "Unknown",
+            "entries": entries[: self.limit],
+        }
 
     # ---- Persistence --------------------------------------------------
 

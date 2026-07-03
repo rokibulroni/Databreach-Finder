@@ -21,7 +21,8 @@ setup(
         # Heavyweight deep-social-media extraction deps (Social X-Ray engine).
         # Kept optional so the core install stays light:
         #   pip install professor-osint[social]
-        "social": ["yt-dlp"],
+        #   playwright install chromium   # one-time browser download for Facebook
+        "social": ["yt-dlp", "instaloader", "playwright"],
     },
     include_package_data=True,
     entry_points={

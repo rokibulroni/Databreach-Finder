@@ -9,12 +9,26 @@ class HtmlReportMixin:
     """Renders the modern responsive HTML intelligence report."""
 
     def generate_html_report(self):
+        import base64
+        import os
+        
+        favicon_tag = ""
+        favicon_path = "docs/favicon.png"
+        if os.path.exists(favicon_path):
+            try:
+                with open(favicon_path, "rb") as img_f:
+                    b64_icon = base64.b64encode(img_f.read()).decode('utf-8')
+                    favicon_tag = f'<link rel="icon" type="image/png" href="data:image/png;base64,{b64_icon}">'
+            except Exception:
+                pass
+
         html_content = f"""<!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>OSINT Intelligence Report</title>
+            {favicon_tag}
             <style>
                 :root {{
                     --bg: #0d1117; --panel: #161b22; --panel-alt: #1c2330;
