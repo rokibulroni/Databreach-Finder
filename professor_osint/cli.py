@@ -7,7 +7,28 @@ from .core.finder import ProfessorOSINT
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Professor OSINT [Enterprise OSINT]")
+    epilog_text = """
+Usage Examples:
+  1. Attack Surface & Port Scan:
+     professor-osint -q "tesla.com" --spider --rustscan
+
+  2. Social Media Recon (Deep Dossier):
+     professor-osint -u "target_username" --analyzer --dossier
+
+  3. Enterprise Workspace Hunt (Google Docs, Trello, Notion):
+     professor-osint -q "company_name" --workspace
+
+  4. Social X-Ray (Extract YouTube/Reddit data):
+     professor-osint --social-xray "https://youtube.com/watch?v=..." --extract-comments
+
+  5. AI Threat Intelligence Report:
+     professor-osint -q "example.com" --spider --ai-analyze
+"""
+    parser = argparse.ArgumentParser(
+        description="Professor OSINT [Enterprise OSINT]",
+        epilog=epilog_text,
+        formatter_class=argparse.RawTextHelpFormatter
+    )
     parser.add_argument("-q", "--query", help="Target search keyword/query (Domain or Company)")
     parser.add_argument("-u", "--username", help="Target username to hunt across social media (Social Recon feature)")
     parser.add_argument("-x", "--dossier", action="store_true", help="Generate Deep Dossier for username")
