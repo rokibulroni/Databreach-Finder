@@ -22,7 +22,11 @@ venv/
 
 # Professor OSINT specific
 download_results_*.txt
+report_*.html
 config.json
+
+# Secrets / API keys
+.env
 
 # Packaging and Builds (Pip / PyInstaller)
 build/
@@ -31,3 +35,4 @@ dist/
 *.spec
 .professor_osint/
 docs/IMPROVEMENT.md
+docs/AI-INTEGRATION.md
