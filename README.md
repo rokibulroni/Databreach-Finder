@@ -72,6 +72,19 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### 🗑️ Uninstallation
+
+If you installed via the one-click web installer or `install.sh`, you can remove everything entirely by running the uninstaller script:
+```bash
+./uninstall.sh   # Mac / Linux
+uninstall.bat    # Windows
+```
+
+If you installed via pip, simply run:
+```bash
+pip uninstall professor-osint
+```
+
 ### Basic Usage
 
 Search a target company or domain:
