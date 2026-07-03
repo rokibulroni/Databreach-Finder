@@ -2,10 +2,11 @@ import re
 import socket
 import random
 import asyncio
+import logging
 
 import aiohttp
 
-from ..common import console
+from ..common import console, redact
 from ..constants import USER_AGENTS
 
 
@@ -58,9 +59,94 @@ class DomainScannersMixin:
                     
         except Exception as e:
             console.print(f"[bold red][!] Harvester Error: {e}[/bold red]")
-            
+
+        # Optional premium enrichment — layered on top of the free scrape above.
+        # Each upgrade is fully gated on a key and degrades gracefully if absent.
+        await self._enrich_virustotal(self.query)
+        await self._enrich_hunter(self.query)
+
         if self.harvester_results['subdomains'] or self.harvester_results['emails']:
             console.print(f"[bold green][+] Harvested {len(self.harvester_results['subdomains'])} Subdomains and {len(self.harvester_results['emails'])} Emails![/bold green]")
+
+    async def _enrich_virustotal(self, domain):
+        """Augment harvester results with VirusTotal v3 data when a key is set.
+
+        Adds passive-DNS subdomains and records domain reputation. VT's free tier
+        allows 4 requests/minute, so every call is throttled. Any failure is
+        logged and swallowed — the scrape results already stand on their own.
+        """
+        vt_key = self.api_keys.get('virustotal')
+        if not vt_key or not domain:
+            return
+
+        headers = {'x-apikey': vt_key, 'Accept': 'application/json'}
+        base = f"https://www.virustotal.com/api/v3/domains/{domain}"
+        try:
+            timeout = aiohttp.ClientTimeout(total=20)
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                # Passive-DNS subdomains.
+                await self._throttle('virustotal', per_minute=4)
+                async with session.get(f"{base}/subdomains?limit=40", headers=headers) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        subs = [item.get('id') for item in data.get('data', []) if item.get('id')]
+                        for sub in subs:
+                            self.harvester_results['subdomains'].add(sub)
+                        console.print(f"[bold green][+] VirusTotal added {len(subs)} subdomain(s) via authenticated API![/bold green]")
+                    elif resp.status in (401, 403):
+                        console.print("[bold yellow][!] VirusTotal key rejected — skipping VT enrichment.[/bold yellow]")
+                        return
+                    elif resp.status == 429:
+                        console.print("[bold yellow][!] VirusTotal rate limit hit — skipping VT enrichment.[/bold yellow]")
+                        return
+
+                # Domain reputation snapshot.
+                await self._throttle('virustotal', per_minute=4)
+                async with session.get(base, headers=headers) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        attrs = data.get('data', {}).get('attributes', {})
+                        stats = attrs.get('last_analysis_stats', {})
+                        self.harvester_results['reputation'] = {
+                            'score': attrs.get('reputation'),
+                            'malicious': stats.get('malicious', 0),
+                            'suspicious': stats.get('suspicious', 0),
+                            'harmless': stats.get('harmless', 0),
+                        }
+                        console.print(
+                            f"[bold green][+] VirusTotal reputation: "
+                            f"{self.harvester_results['reputation']['malicious']} malicious / "
+                            f"{self.harvester_results['reputation']['suspicious']} suspicious detections.[/bold green]"
+                        )
+        except Exception as e:
+            logging.error("VirusTotal enrichment failed for %s: %s", domain, redact(str(e)))
+            console.print("[bold yellow][!] VirusTotal enrichment error — continuing with scraped data.[/bold yellow]")
+
+    async def _enrich_hunter(self, domain):
+        """Augment harvested emails via Hunter.io domain-search when a key is set."""
+        hunter_key = self.api_keys.get('hunter')
+        if not hunter_key or not domain:
+            return
+
+        url = f"https://api.hunter.io/v2/domain-search?domain={domain}&api_key={hunter_key}&limit=50"
+        try:
+            timeout = aiohttp.ClientTimeout(total=20)
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                await self._throttle('hunter', per_minute=15)
+                async with session.get(url) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        emails = [e.get('value') for e in data.get('data', {}).get('emails', []) if e.get('value')]
+                        for email in emails:
+                            self.harvester_results['emails'].add(email)
+                        console.print(f"[bold green][+] Hunter.io added {len(emails)} structured email(s) via authenticated API![/bold green]")
+                    elif resp.status in (401, 403):
+                        console.print("[bold yellow][!] Hunter.io key rejected — skipping Hunter enrichment.[/bold yellow]")
+                    elif resp.status == 429:
+                        console.print("[bold yellow][!] Hunter.io rate limit hit — skipping Hunter enrichment.[/bold yellow]")
+        except Exception as e:
+            logging.error("Hunter.io enrichment failed for %s: %s", domain, redact(str(e)))
+            console.print("[bold yellow][!] Hunter.io enrichment error — continuing with scraped data.[/bold yellow]")
 
     async def spider_search_async(self):
         if not self.spider or not self.query:

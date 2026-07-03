@@ -14,6 +14,7 @@ from .net import NetMixin
 from ..reporting.database import DatabaseMixin
 from ..reporting.html_report import HtmlReportMixin
 from ..reporting.ai_analyzer import AiAnalyzerMixin
+from ..reporting.api_config import ApiConfigMixin
 from ..scanners.domain import DomainScannersMixin
 from ..scanners.people import PeopleScannersMixin
 from ..scanners.discovery import DiscoveryScannersMixin
@@ -25,6 +26,7 @@ class ProfessorOSINT(
     DatabaseMixin,
     HtmlReportMixin,
     AiAnalyzerMixin,
+    ApiConfigMixin,
     DomainScannersMixin,
     PeopleScannersMixin,
     DiscoveryScannersMixin,
@@ -92,7 +94,7 @@ class ProfessorOSINT(
         self.playbook_commands = []
         self.workspace_results = []
         self.phone_results = {}
-        self.harvester_results = {'subdomains': set(), 'emails': set()}
+        self.harvester_results = {'subdomains': set(), 'emails': set(), 'reputation': None}
         self.spider_results = {}
         self.awesome_results = []
         self.toolbox_results = []
@@ -332,7 +334,17 @@ class ProfessorOSINT(
             if self.harvester_results['emails']:
                 em_str = "\n".join(self.harvester_results['emails'])
                 table.add_row("Emails", em_str)
-                
+
+            rep = self.harvester_results.get('reputation')
+            if rep:
+                rep_str = (
+                    f"Score: {rep.get('score')}\n"
+                    f"Malicious: {rep.get('malicious', 0)}  |  "
+                    f"Suspicious: {rep.get('suspicious', 0)}  |  "
+                    f"Harmless: {rep.get('harmless', 0)}"
+                )
+                table.add_row("VT Reputation", rep_str)
+
             console.print(table)
             
         # Display Attack Surface Results

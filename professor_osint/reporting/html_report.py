@@ -168,7 +168,18 @@ class HtmlReportMixin:
                 for em in self.harvester_results['emails']:
                     html_content += f"<li>{em}</li>"
                 html_content += "</ul>"
-                
+            rep = self.harvester_results.get('reputation')
+            if rep:
+                html_content += (
+                    "<h3>VirusTotal Reputation</h3>"
+                    "<div class=\"webcheck-box\">"
+                    f"<div class=\"webcheck-item\"><strong>Reputation Score:</strong> {rep.get('score')}</div>"
+                    f"<div class=\"webcheck-item\"><strong>Malicious:</strong> {rep.get('malicious', 0)}</div>"
+                    f"<div class=\"webcheck-item\"><strong>Suspicious:</strong> {rep.get('suspicious', 0)}</div>"
+                    f"<div class=\"webcheck-item\"><strong>Harmless:</strong> {rep.get('harmless', 0)}</div>"
+                    "</div>"
+                )
+
         if self.spider_results:
             html_content += f"""
             <h2>🕸️ Attack Surface Mapping Engine</h2>

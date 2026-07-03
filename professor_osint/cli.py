@@ -27,6 +27,7 @@ def main():
     parser.add_argument("--i-am-authorized", dest="authorized", action="store_true", help="Confirm authorized use and skip the Social X-Ray consent prompt")
     parser.add_argument("--ai-analyze", dest="ai_analyze", action="store_true", help="AI Threat Intelligence Analysis (turn raw OSINT dumps into an analyst report)")
     parser.add_argument("--config-ai", dest="config_ai", action="store_true", help="Interactive setup wizard for the AI analyst (provider, model, endpoint)")
+    parser.add_argument("--config-api", dest="config_api", action="store_true", help="Interactive setup wizard for OSINT API keys (Shodan, VirusTotal, Hunter.io)")
     parser.add_argument("-r", "--recommend", action="store_true", help="Fetch OSINT tool recommendations from your Live API ecosystem")
     parser.add_argument("-p", "--playbook", action="store_true", help="Fetch ready-to-run Terminal commands for your target")
     parser.add_argument("-e", "--extract", choices=list(PATTERNS.keys()), help="Specific data pattern to extract from dumps")
@@ -40,6 +41,11 @@ def main():
     # Setup command: launch the AI provider wizard and exit before scanning.
     if args.config_ai:
         ProfessorOSINT(config_path=args.config).config_ai_wizard()
+        return
+
+    # Setup command: launch the OSINT API-key wizard and exit before scanning.
+    if args.config_api:
+        ProfessorOSINT(config_path=args.config).config_api_wizard()
         return
 
     if not args.query and not args.username and not args.social_xray:
