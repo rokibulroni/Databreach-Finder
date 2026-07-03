@@ -23,3 +23,11 @@ venv/
 # Professor OSINT specific
 download_results_*.txt
 config.json
+
+# Packaging and Builds (Pip / PyInstaller)
+build/
+dist/
+*.egg-info/
+*.spec
+.professor_osint/
+docs/IMPROVEMENT.md
