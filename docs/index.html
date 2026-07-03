@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,7 +38,7 @@
             margin: 0;
             padding: 0;
             line-height: 1.6;
-            background-image: 
+            background-image:
                 linear-gradient(var(--border) 1px, transparent 1px),
                 linear-gradient(90deg, var(--border) 1px, transparent 1px);
             background-size: 50px 50px;
@@ -184,11 +185,11 @@
 
         .terminal-block {
             margin-top: 80px;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.8);
             border: 1px solid #333;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
         .terminal-header {
@@ -210,9 +211,17 @@
             border-radius: 50%;
         }
 
-        .dot:nth-child(1) { background: #ff5f56; }
-        .dot:nth-child(2) { background: #ffbd2e; }
-        .dot:nth-child(3) { background: #27c93f; }
+        .dot:nth-child(1) {
+            background: #ff5f56;
+        }
+
+        .dot:nth-child(2) {
+            background: #ffbd2e;
+        }
+
+        .dot:nth-child(3) {
+            background: #27c93f;
+        }
 
         .terminal-body {
             padding: 30px;
@@ -221,9 +230,14 @@
             font-size: 0.95rem;
         }
 
-        .prompt { color: #fff; }
-        .comment { color: #666; }
-        
+        .prompt {
+            color: #fff;
+        }
+
+        .comment {
+            color: #666;
+        }
+
         footer {
             text-align: center;
             margin-top: 80px;
@@ -231,7 +245,7 @@
             border-top: 1px solid var(--border);
             color: var(--text-dim);
         }
-        
+
         footer a {
             color: var(--primary);
             text-decoration: none;
@@ -254,322 +268,447 @@
             transition: all 0.3s ease;
             z-index: 1000;
         }
-        
+
         .theme-toggle:hover {
             box-shadow: 0 0 15px var(--primary-glow);
             transform: scale(1.1);
         }
-        
+
         :root.light-mode .cmd {
             background: #e2e8f0;
             border: 1px solid #cbd5e1;
             color: #b45309;
         }
 
-        .sun-icon { display: block; }
-        .moon-icon { display: none; }
-        
-        :root.light-mode .sun-icon { display: none; }
-        :root.light-mode .moon-icon { display: block; }
+        .sun-icon {
+            display: block;
+        }
+
+        .moon-icon {
+            display: none;
+        }
+
+        :root.light-mode .sun-icon {
+            display: none;
+        }
+
+        :root.light-mode .moon-icon {
+            display: block;
+        }
     </style>
 </head>
+
 <body>
 
-<button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle Light/Dark Mode">
-    <!-- Sun SVG -->
-    <svg class="sun-icon" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="5"></circle>
-        <line x1="12" y1="1" x2="12" y2="3"></line>
-        <line x1="12" y1="21" x2="12" y2="23"></line>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-        <line x1="1" y1="12" x2="3" y2="12"></line>
-        <line x1="21" y1="12" x2="23" y2="12"></line>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-    </svg>
-    <!-- Moon SVG -->
-    <svg class="moon-icon" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-    </svg>
-</button>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn" aria-label="Toggle Theme"
+        title="Toggle Light/Dark Mode">
+        <!-- Sun SVG -->
+        <svg class="sun-icon" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+            fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <!-- Moon SVG -->
+        <svg class="moon-icon" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+            fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </button>
 
-<div class="container">
-    <header>
-        <h1>Professor OSINT</h1>
-        <p class="subtitle">The Ultimate Enterprise OSINT & Attack Surface Discovery Framework. Fast, Native, and 100% Dependency-Free.</p>
-        <div class="hero-buttons">
-            <a href="https://github.com/rokibulroni/professor-osint" class="btn btn-primary">View on GitHub</a>
-            <a href="#features" class="btn btn-secondary">Explore Features</a>
-        </div>
-    </header>
-
-    <div class="terminal-block">
-        <div class="terminal-header">
-            <div class="dots">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
+    <div class="container">
+        <header>
+            <h1>Professor OSINT</h1>
+            <p class="subtitle">The Ultimate Enterprise OSINT & Attack Surface Discovery Framework. Fast, Native, and
+                100% Dependency-Free.</p>
+            <div class="hero-buttons">
+                <a href="https://github.com/rokibulroni/professor-osint" class="btn btn-primary">View on GitHub</a>
+                <a href="#features" class="btn btn-secondary">Explore Features</a>
             </div>
-            <div style="margin: 0 auto; color: #888; font-family: sans-serif; font-size: 0.85rem;">professor_osint.py — bash</div>
+        </header>
+
+        <div class="terminal-block">
+            <div class="terminal-header">
+                <div class="dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <div style="margin: 0 auto; color: #888; font-family: sans-serif; font-size: 0.85rem;">
+                    professor_osint.py — bash</div>
+            </div>
+            <div class="terminal-body">
+                <span class="comment"># Run the unified Web Installer</span><br>
+                <span class="prompt">$</span> curl -sL https://posint.rokibulroni.com/install | bash<br>
+                <br>
+                <span class="comment"># Launch a comprehensive Enterprise-level scan</span><br>
+                <span class="prompt">$</span> professor-osint --query "tesla.com" --spider --rustscan --workspace
+                --report html<br>
+                <br>
+                Starting Enterprise Scan Engine... [OK]<br>
+                Mapping Attack Surface... [OK]<br>
+                Sweeping Active Ports... [OK]<br>
+                Generating Executive Report... [DONE]
+            </div>
         </div>
-        <div class="terminal-body">
-            <span class="comment"># Run the unified Web Installer</span><br>
-            <span class="prompt">$</span> curl -sL https://posint.rokibulroni.com/install | bash<br>
-            <br>
-            <span class="comment"># Launch a comprehensive Enterprise-level scan</span><br>
-            <span class="prompt">$</span> professor-osint --query "tesla.com" --spider --rustscan --workspace --report html<br>
-            <br>
-            Starting Enterprise Scan Engine... [OK]<br>
-            Mapping Attack Surface... [OK]<br>
-            Sweeping Active Ports... [OK]<br>
-            Generating Executive Report... [DONE]
+
+        <h2 id="features"
+            style="text-align:center; margin-top:100px; font-size:2.5rem; text-shadow: 0 0 20px var(--border);">
+            Enterprise Modules</h2>
+
+        <div class="grid">
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 4.61a10 10 0 1 1-14.8 0"></path>
+                        <line x1="12" y1="1" x2="12" y2="4"></line>
+                        <line x1="12" y1="20" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="6.34" y2="6.34"></line>
+                        <line x1="17.66" y1="17.66" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="4" y2="12"></line>
+                        <line x1="20" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="6.34" y2="17.66"></line>
+                        <line x1="17.66" y1="6.34" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </div>
+                <h3>Attack Surface Mapping</h3>
+                <p>Passively resolve IPs and map out open ports, cloud hostnames, CDN tags, and known vulnerabilities
+                    (CVEs) without alerting the target.</p>
+                <div class="cmd">--query "example.com" --spider</div>
+            </div>
+
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                </div>
+                <h3>Active Port Scanner</h3>
+                <p>Harness the power of asynchronous Python (asyncio) to actively sweep thousands of common ports in
+                    mere seconds.</p>
+                <div class="cmd">--query "scanme.nmap.org" --rustscan</div>
+            </div>
+
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path
+                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                        </path>
+                    </svg>
+                </div>
+                <h3>Domain Intelligence</h3>
+                <p>Instantly enumerate subdomains and exposed corporate emails through certificate transparency logs and
+                    search scraping.</p>
+                <div class="cmd">--query "example.com" --harvester</div>
+            </div>
+
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                    </svg>
+                </div>
+                <h3>Workspace Intelligence</h3>
+                <p>Hunt for sensitive documents exposed in Google Drive, Docs, Trello boards, and Notion workspaces
+                    associated with the target.</p>
+                <div class="cmd">--query "company" --workspace</div>
+            </div>
+
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <h3>Social Recon & Dossier</h3>
+                <p>Map a target's digital footprint across platforms and generate detailed dossiers including bios, real
+                    names, and profile pictures.</p>
+                <div class="cmd">--username "target" --analyzer --dossier</div>
+            </div>
+
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                        </path>
+                    </svg>
+                </div>
+                <h3>Telecom Intelligence</h3>
+                <p>Perform carrier, regional, and time-zone lookups on international phone numbers, coupled with
+                    automated footprint dorking.</p>
+                <div class="cmd">--query "+1234567890" --phone</div>
+            </div>
+
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                        </polygon>
+                    </svg>
+                </div>
+                <h3>Resource Discovery</h3>
+                <p>Dynamically query GitHub's public APIs to instantly discover the top-rated open-source hacking tools
+                    for any specific vulnerability.</p>
+                <div class="cmd">--query "phishing" --awesome</div>
+            </div>
+
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z">
+                        </path>
+                    </svg>
+                </div>
+                <h3>The Professor's Toolbox</h3>
+                <p>Access a built-in interactive encyclopedia of curated hacking tools, complete with exact terminal
+                    installation commands.</p>
+                <div class="cmd">--query "wireless" --toolbox</div>
+            </div>
+
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="4 17 10 11 4 5"></polyline>
+                        <line x1="12" y1="19" x2="20" y2="19"></line>
+                    </svg>
+                </div>
+                <h3>Terminal Playbook</h3>
+                <p>Dynamically inject ready-to-run terminal commands directly into your CLI based on your target's
+                    infrastructure.</p>
+                <div class="cmd">--query "target.com" --webcheck --playbook</div>
+            </div>
+
+            <div class="card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.4V11h2a2 2 0 0 1 2 2v1h1a2 2 0 0 1 0 4h-1v1a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-1H5a2 2 0 0 1 0-4h1v-1a2 2 0 0 1 2-2h2V9.4A4 4 0 0 1 8 6a4 4 0 0 1 4-4z">
+                        </path>
+                    </svg>
+                </div>
+                <h3>AI Threat Intelligence</h3>
+                <p>Hand off raw OSINT dumps to a local (Ollama, LM Studio) or cloud (OpenAI, Gemini, Anthropic,
+                    DeepSeek) LLM to auto-generate a polished analyst report with prioritized risks and mitigation
+                    steps.</p>
+                <div class="cmd">--query "example.com" --harvester --spider --ai-analyze</div>
+            </div>
         </div>
+
+        <h2 id="uninstallation"
+            style="text-align:center; margin-top:100px; font-size:2.5rem; text-shadow: 0 0 20px var(--border);">🗑️
+            Uninstallation</h2>
+
+        <div
+            style="max-width: 900px; margin: 40px auto; background: var(--surface); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); color: var(--text-main);">
+            <h3 style="color: var(--primary); margin-bottom: 10px;">1. Standard Uninstallation (Tool Only)</h3>
+            <p style="font-size: 1.05rem; margin-bottom: 15px;">If you installed via the one-click web installer or
+                <code>install.sh</code>, you can remove the tool and its isolated Python virtual environment by running:
+            </p>
+            <div class="cmd" style="margin-bottom: 20px;">
+                <span class="comment"># macOS / Linux</span><br>
+                <span class="prompt">$</span> ./uninstall.sh<br><br>
+                <span class="comment"># Windows</span><br>
+                <span class="prompt">C:\></span> uninstall.bat
+            </div>
+            <p style="font-size: 1.05rem; margin-bottom: 30px;"><em>(If you installed globally via <strong>pip</strong>,
+                    run <code>pip uninstall professor-osint</code> instead)</em></p>
+
+            <h3 style="color: var(--primary); margin-bottom: 10px;">2. Complete Eradication (Tool + System Dependencies)
+            </h3>
+            <p style="font-size: 1.05rem; margin-bottom: 15px;">To remove the tool AND all third-party system packages
+                it relies on (Tor, Nmap, RustScan), run the uninstaller above, then use your package manager:</p>
+            <div class="cmd">
+                <span class="comment"># macOS (Homebrew)</span><br>
+                <span class="prompt">$</span> brew uninstall tor nmap rustscan<br><br>
+                <span class="comment"># Debian / Ubuntu (APT)</span><br>
+                <span class="prompt">$</span> sudo apt-get remove --purge tor nmap rustscan<br>
+                <span class="prompt">$</span> sudo apt-get autoremove<br><br>
+                <span class="comment"># Arch Linux (Pacman)</span><br>
+                <span class="prompt">$</span> sudo pacman -Rns tor nmap rustscan
+            </div>
+        </div>
+
+        <h2 id="commands"
+            style="text-align:center; margin-top:100px; font-size:2.5rem; text-shadow: 0 0 20px var(--border);">A-Z
+            Command Reference</h2>
+
+        <div
+            style="max-width: 900px; margin: 40px auto; background: var(--surface); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; color: var(--text-main);">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                        <th style="padding: 15px; color: var(--primary);">Command / Flag</th>
+                        <th style="padding: 15px; color: var(--primary);">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--ai-analyze</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">AI Threat Intelligence Analysis. Feeds the
+                            gathered OSINT dumps to a configured LLM and appends an analyst report (risks + mitigation).
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>-a, --analyzer</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Perform Social Analyzer permutations and
+                            confidence scoring.</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--awesome</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Resource Discovery Engine (Discover Top
+                            Curated GitHub Tools).</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>-c, --config</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Path to custom config file (default:
+                            config.json).</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--config-ai</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Interactive setup wizard for the AI analyst
+                            (provider, model, endpoint) with live validation.</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>-x, --dossier</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Generate Deep Dossier for username.</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>-e, --extract</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Specific data pattern to extract from dumps.
+                            Choices: <code>emails</code>, <code>cards</code>, <code>ipv4</code>, <code>btc</code>,
+                            <code>eth</code>, <code>aws_key</code>, <code>jwt</code>, <code>rsa_private</code>.</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--harvester</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Domain Intelligence Engine (Rapid Subdomain
+                            and Email Enumeration).</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>-m, --monitor</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Global Threat Monitor (Live OSINT News
+                            Integration).</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--phone</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Telecom Intelligence Profile (Carrier,
+                            Region, and Footprint Dorking).</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>-p, --playbook</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Fetch ready-to-run Terminal commands for your
+                            target.</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>-q, --query</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Target search keyword/query (Domain or
+                            Company).</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>-r, --recommend</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Fetch OSINT tool recommendations from your
+                            Live API ecosystem.</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--report</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Generate a professional HTML report. Choice:
+                            <code>html</code>.</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--rustscan</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">RustScan Engine (Ultra-Fast Asynchronous Port
+                            Scanner).</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--spider</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Attack Surface Mapping Engine (Ports, CVEs).
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>-t, --threads</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Number of concurrent connections (default:
+                            10).</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--toolbox</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">The Professor's Toolbox (Built-in Installer
+                            Menu). Search categories: <code>phishing</code>, <code>wireless</code>, <code>osint</code>,
+                            <code>exploitation</code>, <code>anonymity</code>.</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>--tor</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Route traffic through local Tor SOCKS5 proxy
+                            (127.0.0.1:9050).</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>-u, --username</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Target username to hunt across social media
+                            (Social Recon feature).</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 15px; white-space: nowrap;"><code>-w, --webcheck</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Live Domain Intelligence (DNS, SSL, Headers).
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 15px; white-space: nowrap;"><code>--workspace</code></td>
+                        <td style="padding: 15px; color: var(--text-dim);">Enterprise Workspace Intelligence (Google
+                            Drive, Docs, Trello, Notion).</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer>
+            <p>Built with <svg viewBox="0 0 24 24" width="16" height="16" fill="red"
+                    style="display: inline-block; vertical-align: middle; margin: -2px 2px 0 2px;">
+                    <path
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg> by <b>Rokibul Roni</b></p>
+            <p><a href="https://posint.rokibulroni.com">posint.rokibulroni.com</a> | <a
+                    href="https://github.com/rokibulroni/professor-osint">GitHub Repository</a></p>
+        </footer>
     </div>
 
-    <h2 id="features" style="text-align:center; margin-top:100px; font-size:2.5rem; text-shadow: 0 0 20px var(--border);">Enterprise Modules</h2>
-
-    <div class="grid">
-        <div class="card">
-            <div class="icon">
-                <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 4.61a10 10 0 1 1-14.8 0"></path><line x1="12" y1="1" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"></line><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"></line><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"></line></svg>
-            </div>
-            <h3>Attack Surface Mapping</h3>
-            <p>Passively resolve IPs and map out open ports, cloud hostnames, CDN tags, and known vulnerabilities (CVEs) without alerting the target.</p>
-            <div class="cmd">--query "example.com" --spider</div>
-        </div>
-
-        <div class="card">
-            <div class="icon">
-                <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-            </div>
-            <h3>Active Port Scanner</h3>
-            <p>Harness the power of asynchronous Python (asyncio) to actively sweep thousands of common ports in mere seconds.</p>
-            <div class="cmd">--query "scanme.nmap.org" --rustscan</div>
-        </div>
-
-        <div class="card">
-            <div class="icon">
-                <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-            </div>
-            <h3>Domain Intelligence</h3>
-            <p>Instantly enumerate subdomains and exposed corporate emails through certificate transparency logs and search scraping.</p>
-            <div class="cmd">--query "example.com" --harvester</div>
-        </div>
-
-        <div class="card">
-            <div class="icon">
-                <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-            </div>
-            <h3>Workspace Intelligence</h3>
-            <p>Hunt for sensitive documents exposed in Google Drive, Docs, Trello boards, and Notion workspaces associated with the target.</p>
-            <div class="cmd">--query "company" --workspace</div>
-        </div>
-
-        <div class="card">
-            <div class="icon">
-                <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            </div>
-            <h3>Social Recon & Dossier</h3>
-            <p>Map a target's digital footprint across platforms and generate detailed dossiers including bios, real names, and profile pictures.</p>
-            <div class="cmd">--username "target" --analyzer --dossier</div>
-        </div>
-        
-        <div class="card">
-            <div class="icon">
-                <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-            </div>
-            <h3>Telecom Intelligence</h3>
-            <p>Perform carrier, regional, and time-zone lookups on international phone numbers, coupled with automated footprint dorking.</p>
-            <div class="cmd">--query "+1234567890" --phone</div>
-        </div>
-
-        <div class="card">
-            <div class="icon">
-                <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-            </div>
-            <h3>Resource Discovery</h3>
-            <p>Dynamically query GitHub's public APIs to instantly discover the top-rated open-source hacking tools for any specific vulnerability.</p>
-            <div class="cmd">--query "phishing" --awesome</div>
-        </div>
-
-        <div class="card">
-            <div class="icon">
-                <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-            </div>
-            <h3>The Professor's Toolbox</h3>
-            <p>Access a built-in interactive encyclopedia of curated hacking tools, complete with exact terminal installation commands.</p>
-            <div class="cmd">--query "wireless" --toolbox</div>
-        </div>
-
-        <div class="card">
-            <div class="icon">
-                <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
-            </div>
-            <h3>Terminal Playbook</h3>
-            <p>Dynamically inject ready-to-run terminal commands directly into your CLI based on your target's infrastructure.</p>
-            <div class="cmd">--query "target.com" --webcheck --playbook</div>
-        </div>
-
-        <div class="card">
-            <div class="icon">
-                <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.4V11h2a2 2 0 0 1 2 2v1h1a2 2 0 0 1 0 4h-1v1a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-1H5a2 2 0 0 1 0-4h1v-1a2 2 0 0 1 2-2h2V9.4A4 4 0 0 1 8 6a4 4 0 0 1 4-4z"></path></svg>
-            </div>
-            <h3>AI Threat Intelligence</h3>
-            <p>Hand off raw OSINT dumps to a local (Ollama, LM Studio) or cloud (OpenAI, Gemini, Anthropic, DeepSeek) LLM to auto-generate a polished analyst report with prioritized risks and mitigation steps.</p>
-            <div class="cmd">--query "example.com" --harvester --spider --ai-analyze</div>
-        </div>
-    </div>
-
-    <h2 id="uninstallation" style="text-align:center; margin-top:100px; font-size:2.5rem; text-shadow: 0 0 20px var(--border);">🗑️ Uninstallation</h2>
-    
-    <div style="max-width: 900px; margin: 40px auto; background: var(--surface); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); color: var(--text-main);">
-        <h3 style="color: var(--primary); margin-bottom: 10px;">1. Standard Uninstallation (Tool Only)</h3>
-        <p style="font-size: 1.05rem; margin-bottom: 15px;">If you installed via the one-click web installer or <code>install.sh</code>, you can remove the tool and its isolated Python virtual environment by running:</p>
-        <div class="cmd" style="margin-bottom: 20px;">
-            <span class="comment"># macOS / Linux</span><br>
-            <span class="prompt">$</span> ./uninstall.sh<br><br>
-            <span class="comment"># Windows</span><br>
-            <span class="prompt">C:\></span> uninstall.bat
-        </div>
-        <p style="font-size: 1.05rem; margin-bottom: 30px;"><em>(If you installed globally via <strong>pip</strong>, run <code>pip uninstall professor-osint</code> instead)</em></p>
-
-        <h3 style="color: var(--primary); margin-bottom: 10px;">2. Complete Eradication (Tool + System Dependencies)</h3>
-        <p style="font-size: 1.05rem; margin-bottom: 15px;">To remove the tool AND all third-party system packages it relies on (Tor, Nmap, RustScan), run the uninstaller above, then use your package manager:</p>
-        <div class="cmd">
-            <span class="comment"># macOS (Homebrew)</span><br>
-            <span class="prompt">$</span> brew uninstall tor nmap rustscan<br><br>
-            <span class="comment"># Debian / Ubuntu (APT)</span><br>
-            <span class="prompt">$</span> sudo apt-get remove --purge tor nmap rustscan<br>
-            <span class="prompt">$</span> sudo apt-get autoremove<br><br>
-            <span class="comment"># Arch Linux (Pacman)</span><br>
-            <span class="prompt">$</span> sudo pacman -Rns tor nmap rustscan
-        </div>
-    </div>
-
-    <h2 id="commands" style="text-align:center; margin-top:100px; font-size:2.5rem; text-shadow: 0 0 20px var(--border);">A-Z Command Reference</h2>
-    
-    <div style="max-width: 900px; margin: 40px auto; background: var(--surface); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; color: var(--text-main);">
-            <thead>
-                <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-                    <th style="padding: 15px; color: var(--primary);">Command / Flag</th>
-                    <th style="padding: 15px; color: var(--primary);">Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>--ai-analyze</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">AI Threat Intelligence Analysis. Feeds the gathered OSINT dumps to a configured LLM and appends an analyst report (risks + mitigation).</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>-a, --analyzer</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Perform Social Analyzer permutations and confidence scoring.</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>--awesome</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Resource Discovery Engine (Discover Top Curated GitHub Tools).</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>-c, --config</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Path to custom config file (default: config.json).</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>--config-ai</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Interactive setup wizard for the AI analyst (provider, model, endpoint) with live validation.</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>-x, --dossier</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Generate Deep Dossier for username.</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>-e, --extract</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Specific data pattern to extract from dumps. Choices: <code>emails</code>, <code>cards</code>, <code>ipv4</code>, <code>btc</code>, <code>eth</code>, <code>aws_key</code>, <code>jwt</code>, <code>rsa_private</code>.</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>--harvester</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Domain Intelligence Engine (Rapid Subdomain and Email Enumeration).</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>-m, --monitor</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Global Threat Monitor (Live OSINT News Integration).</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>--phone</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Telecom Intelligence Profile (Carrier, Region, and Footprint Dorking).</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>-p, --playbook</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Fetch ready-to-run Terminal commands for your target.</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>-q, --query</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Target search keyword/query (Domain or Company).</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>-r, --recommend</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Fetch OSINT tool recommendations from your Live API ecosystem.</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>--report</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Generate a professional HTML report. Choice: <code>html</code>.</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>--rustscan</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">RustScan Engine (Ultra-Fast Asynchronous Port Scanner).</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>--spider</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Attack Surface Mapping Engine (Ports, CVEs).</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>-t, --threads</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Number of concurrent connections (default: 10).</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>--toolbox</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">The Professor's Toolbox (Built-in Installer Menu). Search categories: <code>phishing</code>, <code>wireless</code>, <code>osint</code>, <code>exploitation</code>, <code>anonymity</code>.</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>--tor</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Route traffic through local Tor SOCKS5 proxy (127.0.0.1:9050).</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>-u, --username</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Target username to hunt across social media (Social Recon feature).</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 15px; white-space: nowrap;"><code>-w, --webcheck</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Live Domain Intelligence (DNS, SSL, Headers).</td>
-                </tr>
-                <tr>
-                    <td style="padding: 15px; white-space: nowrap;"><code>--workspace</code></td>
-                    <td style="padding: 15px; color: var(--text-dim);">Enterprise Workspace Intelligence (Google Drive, Docs, Trello, Notion).</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <footer>
-        <p>Built with <svg viewBox="0 0 24 24" width="16" height="16" fill="red" style="display: inline-block; vertical-align: middle; margin: -2px 2px 0 2px;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> by <b>Rokibul Roni</b></p>
-        <p><a href="https://posint.rokibulroni.com">posint.rokibulroni.com</a> | <a href="https://github.com/rokibulroni/professor-osint">GitHub Repository</a></p>
-    </footer>
-</div>
-
-<script>
-    function toggleTheme() {
-        document.documentElement.classList.toggle('light-mode');
-        if (document.documentElement.classList.contains('light-mode')) {
-            localStorage.setItem('theme', 'light');
-        } else {
-            localStorage.setItem('theme', 'dark');
+    <script>
+        function toggleTheme() {
+            document.documentElement.classList.toggle('light-mode');
+            if (document.documentElement.classList.contains('light-mode')) {
+                localStorage.setItem('theme', 'light');
+            } else {
+                localStorage.setItem('theme', 'dark');
+            }
         }
-    }
 
-    // Load saved theme or system preference
-    if (localStorage.getItem('theme') === 'light' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: light)').matches)) {
-        document.documentElement.classList.add('light-mode');
-    }
-</script>
+        // Load saved theme or system preference
+        if (localStorage.getItem('theme') === 'light' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+            document.documentElement.classList.add('light-mode');
+        }
+    </script>
 </body>
+
 </html>
