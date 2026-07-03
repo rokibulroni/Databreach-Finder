@@ -313,12 +313,11 @@
             <div style="margin: 0 auto; color: #888; font-family: sans-serif; font-size: 0.85rem;">professor_osint.py — bash</div>
         </div>
         <div class="terminal-body">
-            <span class="comment"># Clone and setup the framework</span><br>
-            <span class="prompt">$</span> git clone https://github.com/rokibulroni/professor-osint.git<br>
-            <span class="prompt">$</span> cd professor-osint && source venv/bin/activate<br>
+            <span class="comment"># Run the unified Web Installer</span><br>
+            <span class="prompt">$</span> curl -sL https://posint.rokibulroni.com/install | bash<br>
             <br>
             <span class="comment"># Launch a comprehensive Enterprise-level scan</span><br>
-            <span class="prompt">$</span> python3 professor_osint.py --query "tesla.com" --spider --rustscan --workspace --report html<br>
+            <span class="prompt">$</span> professor-osint --query "tesla.com" --spider --rustscan --workspace --report html<br>
             <br>
             Starting Enterprise Scan Engine... [OK]<br>
             Mapping Attack Surface... [OK]<br>

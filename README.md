@@ -47,9 +47,21 @@
 
 ## 🚀 Quick Start
 
-### Installation
+### ⚡ One-Click Web Installer (Recommended)
 
-Clone the repository and install the minimal requirements:
+Run the following command in your terminal. It works on macOS, Linux, and Windows (via Git Bash/WSL) and will automatically guide you through the setup:
+
+```bash
+curl -sL https://posint.rokibulroni.com/install | bash
+```
+
+### 📦 Pip Installation
+```bash
+pip install git+https://github.com/rokibulroni/professor-osint.git
+```
+Then run from anywhere: `professor-osint --help`
+
+### 🛠️ Manual Setup
 
 ```bash
 git clone https://github.com/rokibulroni/professor-osint.git
