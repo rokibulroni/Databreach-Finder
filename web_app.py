@@ -233,7 +233,9 @@ async def websocket_endpoint(websocket: WebSocket):
         logger.info(f"Starting scan with config: {config.model_dump_json()}")
         
         # Build the OSINT command
-        cmd = ["python", "professor_osint.py"]
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        cli_script = os.path.join(base_dir, "professor_osint.py")
+        cmd = ["python", cli_script]
         
         if config.query.strip():
             cmd.extend(["-q", config.query.strip()])
