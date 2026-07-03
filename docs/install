@@ -11,7 +11,7 @@ echo -e "  3) Windows (via Git Bash / WSL)"
 echo -e "  4) Exit"
 echo ""
 
-read -p "Enter your choice (1-4): " os_choice
+read -p "Enter your choice (1-4): " os_choice < /dev/tty
 
 case $os_choice in
     1) OS="mac" ;;
@@ -36,7 +36,7 @@ check_and_install_git_py() {
     fi
     
     echo -e "\033[1;33m[*] Git and/or Python are missing.\033[0m"
-    read -p "Can I use '$pm_name' to install them? (y/n): " pm_choice
+    read -p "Can I use '$pm_name' to install them? (y/n): " pm_choice < /dev/tty
     if [[ "$pm_choice" == "y" || "$pm_choice" == "Y" ]]; then
         eval "$install_cmd"
     else
@@ -45,13 +45,13 @@ check_and_install_git_py() {
 }
 
 echo ""
-read -p "Do you want me to check and install system dependencies (Git, Python3)? (y/n): " dep_choice
+read -p "Do you want me to check and install system dependencies (Git, Python3)? (y/n): " dep_choice < /dev/tty
 if [[ "$dep_choice" == "y" || "$dep_choice" == "Y" ]]; then
     echo -e "\033[1;34m[*] Checking system dependencies for $OS...\033[0m"
     if [ "$OS" == "mac" ]; then
         if ! command -v brew &>/dev/null; then
             echo -e "\033[1;33m[*] Homebrew is not installed.\033[0m"
-            read -p "Do you want to install Homebrew? (y/n): " brew_choice
+            read -p "Do you want to install Homebrew? (y/n): " brew_choice < /dev/tty
             if [[ "$brew_choice" == "y" || "$brew_choice" == "Y" ]]; then
                 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
                 # Add brew to PATH for this script session
@@ -79,13 +79,13 @@ if [[ "$dep_choice" == "y" || "$dep_choice" == "Y" ]]; then
             check_and_install_git_py "winget" "winget install --id Git.Git -e --source winget && winget install --id Python.Python.3.11 -e --source winget"
         else
             echo -e "\033[1;33m[!] On Windows, please ensure you have installed Git and Python from python.org.\033[0m"
-            read -p "Press Enter to continue once you have Git and Python installed..."
+            read -p "Press Enter to continue once you have Git and Python installed..." < /dev/tty
         fi
     fi
 fi
 
 echo ""
-read -p "Do you want to install Docker (Optional)? (y/n): " docker_choice
+read -p "Do you want to install Docker (Optional)? (y/n): " docker_choice < /dev/tty
 if [[ "$docker_choice" == "y" || "$docker_choice" == "Y" ]]; then
     if command -v docker &>/dev/null; then
         echo -e "\033[1;32m[*] Docker is already installed! Skipping...\033[0m"
@@ -93,7 +93,7 @@ if [[ "$docker_choice" == "y" || "$docker_choice" == "Y" ]]; then
         echo -e "\033[1;34m[*] Installing Docker...\033[0m"
         if [ "$OS" == "mac" ]; then
             if command -v brew &>/dev/null; then
-                read -p "Can I use Homebrew (brew) to install Docker Desktop? (y/n): " brew_docker
+                read -p "Can I use Homebrew (brew) to install Docker Desktop? (y/n): " brew_docker < /dev/tty
                 if [[ "$brew_docker" == "y" || "$brew_docker" == "Y" ]]; then
                     brew install --cask docker
                 fi
@@ -101,7 +101,7 @@ if [[ "$docker_choice" == "y" || "$docker_choice" == "Y" ]]; then
                 echo -e "\033[0;31m[!] Homebrew not found. Please install Docker manually.\033[0m"
             fi
         elif [ "$OS" == "linux" ]; then
-            read -p "Can I use the official Docker installation script (get.docker.com)? (y/n): " linux_docker
+            read -p "Can I use the official Docker installation script (get.docker.com)? (y/n): " linux_docker < /dev/tty
             if [[ "$linux_docker" == "y" || "$linux_docker" == "Y" ]]; then
                 curl -fsSL https://get.docker.com -o get-docker.sh
                 sudo sh get-docker.sh
@@ -109,7 +109,7 @@ if [[ "$docker_choice" == "y" || "$docker_choice" == "Y" ]]; then
             fi
         elif [ "$OS" == "windows" ]; then
             if command -v winget &>/dev/null; then
-                read -p "Can I use 'winget' to install Docker Desktop? (y/n): " win_docker
+                read -p "Can I use 'winget' to install Docker Desktop? (y/n): " win_docker < /dev/tty
                 if [[ "$win_docker" == "y" || "$win_docker" == "Y" ]]; then
                     winget install --id Docker.DockerDesktop -e --source winget
                 fi
