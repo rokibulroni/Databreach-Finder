@@ -76,18 +76,18 @@ Here is a brief, detailed A-Z list of all available commands and flags:
 | `--awesome` | Resource Discovery Engine (Discover Top Curated GitHub Tools). |
 | `-c, --config` | Path to custom config file (default: config.json). |
 | `-x, --dossier` | Generate Deep Dossier for username. |
-| `-e, --extract` | Specific data pattern to extract from dumps. |
+| `-e, --extract` | Specific data pattern to extract from dumps. Choices: `emails`, `cards`, `ipv4`, `btc`, `eth`, `aws_key`, `jwt`, `rsa_private`. |
 | `--harvester` | Domain Intelligence Engine (Rapid Subdomain and Email Enumeration). |
 | `-m, --monitor` | Global Threat Monitor (Live OSINT News Integration). |
 | `--phone` | Telecom Intelligence Profile (Carrier, Region, and Footprint Dorking). |
 | `-p, --playbook` | Fetch ready-to-run Terminal commands for your target. |
 | `-q, --query` | Target search keyword/query (Domain or Company). |
 | `-r, --recommend` | Fetch OSINT tool recommendations from your Live API ecosystem. |
-| `--report` | Generate a professional HTML report. |
+| `--report` | Generate a professional HTML report. Choice: `html`. |
 | `--rustscan` | RustScan Engine (Ultra-Fast Asynchronous Port Scanner). |
 | `--spider` | Attack Surface Mapping Engine (Ports, CVEs). |
 | `-t, --threads` | Number of concurrent connections (default: 10). |
-| `--toolbox` | The Professor's Toolbox (Built-in Installer Menu). |
+| `--toolbox` | The Professor's Toolbox (Built-in Installer Menu). Search categories: `phishing`, `wireless`, `osint`, `exploitation`, `anonymity`. |
 | `--tor` | Route traffic through local Tor SOCKS5 proxy (127.0.0.1:9050). |
 | `-u, --username` | Target username to hunt across social media (Social Recon feature). |
 | `-w, --webcheck` | Live Domain Intelligence (DNS, SSL, Headers). |
