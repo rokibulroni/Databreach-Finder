@@ -175,12 +175,13 @@ print_progress_bar 10
 INSTALL_DIR="$HOME/.professor_osint"
 BIN_DIR="$HOME/.local/bin"
 
-if [ -d "$INSTALL_DIR" ]; then
-    echo -e "\033[1;33m[*] Existing installation found. Updating...\033[0m"
+if [ -d "$INSTALL_DIR/.git" ]; then
+    echo -e "\033[1;33m[*] Existing Git installation found. Updating...\033[0m"
     cd "$INSTALL_DIR"
     git pull origin main
 else
-    echo -e "\033[1;34m[*] Cloning repository...\033[0m"
+    echo -e "\033[1;34m[*] Cleaning old installation and cloning repository...\033[0m"
+    rm -rf "$INSTALL_DIR"
     git clone https://github.com/rokibulroni/professor-osint.git "$INSTALL_DIR"
     cd "$INSTALL_DIR"
 fi
