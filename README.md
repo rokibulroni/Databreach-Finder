@@ -75,10 +75,9 @@ pip install -r requirements.txt
 ### 🗑️ Uninstallation
 
 **1. Standard Uninstallation (Tool Only)**
-If you installed via the one-click web installer or `install.sh`, you can remove the tool and its isolated Python virtual environment by running:
+If you installed via the one-click web installer or `install.sh`, you can remove the tool and its isolated Python virtual environment by running the global command:
 ```bash
-./uninstall.sh   # Mac / Linux
-uninstall.bat    # Windows
+professor-osint-uninstall
 ```
 *(If you installed globally via pip, run `pip uninstall professor-osint`)*
 
