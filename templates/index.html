@@ -445,40 +445,36 @@
             <div class="config-section">
                 <h3>Active Modules</h3>
                 
-                <label class="toggle-group">
-                    <span>Web-Check (Live Infra)</span>
-                    <input type="checkbox" id="webcheck" checked>
-                </label>
-                
-                <label class="toggle-group">
-                    <span>RustScan (Fast Ports)</span>
-                    <input type="checkbox" id="rustscan">
-                </label>
-                
-                <label class="toggle-group">
-                    <span>AI Threat Analysis</span>
-                    <input type="checkbox" id="ai_analyze">
-                </label>
-                
-                <label class="toggle-group">
-                    <span>Social X-Ray (Deep Scraping)</span>
-                    <input type="checkbox" id="social_xray">
-                </label>
-                
-                <label class="toggle-group">
-                    <span>Fetch Playbook (-p)</span>
-                    <input type="checkbox" id="playbook" checked>
-                </label>
+                <label class="toggle-group"><span>Domain Harvester</span><input type="checkbox" id="harvester"></label>
+                <label class="toggle-group"><span>Attack Surface Spider</span><input type="checkbox" id="spider"></label>
+                <label class="toggle-group"><span>RustScan (Fast Ports)</span><input type="checkbox" id="rustscan"></label>
+                <label class="toggle-group"><span>Web-Check (Live Infra)</span><input type="checkbox" id="webcheck" checked></label>
+                <label class="toggle-group"><span>Enterprise Workspace Hunt</span><input type="checkbox" id="workspace"></label>
+                <label class="toggle-group"><span>Social Analyzer</span><input type="checkbox" id="analyzer"></label>
+                <label class="toggle-group"><span>Deep Dossier</span><input type="checkbox" id="dossier"></label>
+                <label class="toggle-group"><span>Social X-Ray (Deep Scraping)</span><input type="checkbox" id="social_xray"></label>
+                <label class="toggle-group"><span>Telecom Intelligence</span><input type="checkbox" id="phone"></label>
+                <label class="toggle-group"><span>Global Threat Monitor</span><input type="checkbox" id="monitor"></label>
+                <label class="toggle-group"><span>Resource Discovery (Awesome)</span><input type="checkbox" id="awesome"></label>
+                <label class="toggle-group"><span>Professor's Toolbox</span><input type="checkbox" id="toolbox"></label>
+                <label class="toggle-group"><span>Fetch Playbook (-p)</span><input type="checkbox" id="playbook" checked></label>
+                <label class="toggle-group"><span>Fetch Recommendations (-r)</span><input type="checkbox" id="recommend" checked></label>
+                <label class="toggle-group"><span>AI Threat Analysis</span><input type="checkbox" id="ai_analyze"></label>
 
-                <label class="toggle-group">
-                    <span>Fetch Recommendations (-r)</span>
-                    <input type="checkbox" id="recommend" checked>
-                </label>
-
-                <label class="toggle-group">
-                    <span style="color:var(--danger);">Use Tor Network (SOCKS5)</span>
-                    <input type="checkbox" id="tor">
-                </label>
+                <div class="input-group" style="margin-top: 15px;">
+                    <label>Data Extraction</label>
+                    <select id="extract" style="width:100%; padding:8px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:4px; margin-top:5px;">
+                        <option value="">None</option>
+                        <option value="emails">Emails</option>
+                        <option value="cards">Credit Cards</option>
+                        <option value="ipv4">IPv4 Addresses</option>
+                        <option value="btc">Bitcoin Wallets</option>
+                        <option value="eth">Ethereum Wallets</option>
+                        <option value="aws_key">AWS Keys</option>
+                        <option value="jwt">JWT Tokens</option>
+                        <option value="rsa_private">RSA Private Keys</option>
+                    </select>
+                </div>
             </div>
 
             <button id="launchBtn" class="btn-launch">Initialize Scan</button>
@@ -556,14 +552,23 @@
             const config = {
                 query: document.getElementById('query').value.trim(),
                 username: document.getElementById('username').value.trim(),
-                webcheck: document.getElementById('webcheck').checked,
+                harvester: document.getElementById('harvester').checked,
+                spider: document.getElementById('spider').checked,
                 rustscan: document.getElementById('rustscan').checked,
-                ai_analyze: document.getElementById('ai_analyze').checked,
+                webcheck: document.getElementById('webcheck').checked,
+                workspace: document.getElementById('workspace').checked,
+                analyzer: document.getElementById('analyzer').checked,
+                dossier: document.getElementById('dossier').checked,
                 social_xray: document.getElementById('social_xray').checked,
                 social_xray_url: document.getElementById('social_xray_url').value.trim(),
+                phone: document.getElementById('phone').checked,
+                monitor: document.getElementById('monitor').checked,
+                awesome: document.getElementById('awesome').checked,
+                toolbox: document.getElementById('toolbox').checked,
                 playbook: document.getElementById('playbook').checked,
                 recommend: document.getElementById('recommend').checked,
-                tor: document.getElementById('tor').checked,
+                ai_analyze: document.getElementById('ai_analyze').checked,
+                extract: document.getElementById('extract').value
             };
             
             if (!config.query && !config.username && !config.social_xray_url) {

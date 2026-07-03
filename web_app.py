@@ -48,6 +48,7 @@ class ScanConfig(BaseModel):
     workspace: bool = False
     phone: bool = False
     awesome: bool = False
+    toolbox: bool = False
     recommend: bool = False
     playbook: bool = False
 
@@ -236,6 +237,7 @@ async def websocket_endpoint(websocket: WebSocket):
             "workspace": "--workspace",
             "phone": "--phone",
             "awesome": "--awesome",
+            "toolbox": "--toolbox",
             "recommend": "-r",
             "playbook": "-p"
         }
