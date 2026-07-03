@@ -13,6 +13,7 @@ from ..constants import PATTERNS, DEFAULT_PASTE_SITES
 from .net import NetMixin
 from ..reporting.database import DatabaseMixin
 from ..reporting.html_report import HtmlReportMixin
+from ..reporting.ai_analyzer import AiAnalyzerMixin
 from ..scanners.domain import DomainScannersMixin
 from ..scanners.people import PeopleScannersMixin
 from ..scanners.discovery import DiscoveryScannersMixin
@@ -22,13 +23,14 @@ class ProfessorOSINT(
     NetMixin,
     DatabaseMixin,
     HtmlReportMixin,
+    AiAnalyzerMixin,
     DomainScannersMixin,
     PeopleScannersMixin,
     DiscoveryScannersMixin,
 ):
     """Advanced Data Breach & Intelligence Gathering orchestrator."""
 
-    def __init__(self, query=None, extract_type=None, threads=10, use_tor=False, report_format=None, config_path="config.json", username=None, monitor=False, dossier=False, webcheck=False, recommend=False, playbook=False, analyzer=False, workspace=False, phone=False, harvester=False, spider=False, awesome=False, toolbox=False, rustscan=False):
+    def __init__(self, query=None, extract_type=None, threads=10, use_tor=False, report_format=None, config_path="config.json", username=None, monitor=False, dossier=False, webcheck=False, recommend=False, playbook=False, analyzer=False, workspace=False, phone=False, harvester=False, spider=False, awesome=False, toolbox=False, rustscan=False, ai_analyze=False):
         self.query = query
         self.username = username
         self.extract_type = extract_type
@@ -48,7 +50,9 @@ class ProfessorOSINT(
         self.awesome = awesome
         self.toolbox = toolbox
         self.rustscan = rustscan
-        
+        self.ai_analyze = ai_analyze
+        self.ai_report = None
+
         # Workspace Cross-Pollination (Email -> Username)
         if self.workspace and self.query and '@' in self.query:
             local_handle = self.query.split('@')[0]
@@ -539,9 +543,25 @@ class ProfessorOSINT(
             if report_content:
                 console.print("\n")
                 console.print(Panel(report_content, title="[bold yellow]📑 Final OSINT Report[/bold yellow]", border_style="yellow", expand=False))
-                
+
+            # AI Threat Intelligence hand-off: enrich the raw report with an
+            # LLM-generated analyst write-up when --ai-analyze is set.
+            if self.ai_analyze and report_content:
+                self.ai_report = self.run_ai_analysis(report_content)
+                if self.ai_report:
+                    console.print("\n")
+                    console.print(Panel(self.ai_report, title="[bold magenta]🧠 AI Threat Intelligence Analysis[/bold magenta]", border_style="magenta", expand=False))
+                    with open(txt_filename, 'a', encoding='utf-8') as f:
+                        f.write("\n\n=== AI THREAT INTELLIGENCE ANALYSIS ===\n")
+                        f.write(self.ai_report + "\n")
+
             console.print(f"[bold green][+] Full text results saved to {txt_filename}[/bold green]")
-            
+
+            # Generate the HTML report last, so it captures every section
+            # (including the AI analysis assembled just above).
+            if self.report_format == 'html':
+                self.generate_html_report()
+
         elif not has_data:
             # Do not print "saved to" if no data was found
             pass

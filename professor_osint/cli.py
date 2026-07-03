@@ -21,6 +21,8 @@ def main():
     parser.add_argument("--awesome", action="store_true", help="Resource Discovery Engine (Discover Top Curated GitHub Tools)")
     parser.add_argument("--toolbox", action="store_true", help="The Professor's Toolbox (Built-in Installer Menu)")
     parser.add_argument("--rustscan", action="store_true", help="RustScan Engine (Ultra-Fast Asynchronous Port Scanner)")
+    parser.add_argument("--ai-analyze", dest="ai_analyze", action="store_true", help="AI Threat Intelligence Analysis (turn raw OSINT dumps into an analyst report)")
+    parser.add_argument("--config-ai", dest="config_ai", action="store_true", help="Interactive setup wizard for the AI analyst (provider, model, endpoint)")
     parser.add_argument("-r", "--recommend", action="store_true", help="Fetch OSINT tool recommendations from your Live API ecosystem")
     parser.add_argument("-p", "--playbook", action="store_true", help="Fetch ready-to-run Terminal commands for your target")
     parser.add_argument("-e", "--extract", choices=list(PATTERNS.keys()), help="Specific data pattern to extract from dumps")
@@ -30,7 +32,12 @@ def main():
     parser.add_argument("-c", "--config", default="config.json", help="Path to custom config file (default: config.json)")
     
     args = parser.parse_args()
-    
+
+    # Setup command: launch the AI provider wizard and exit before scanning.
+    if args.config_ai:
+        ProfessorOSINT(config_path=args.config).config_ai_wizard()
+        return
+
     if not args.query and not args.username:
         console.print("[bold red][!] You must provide either a --query (-q) or a --username (-u).[/bold red]")
         return
@@ -55,7 +62,8 @@ def main():
         spider=args.spider,
         awesome=args.awesome,
         toolbox=args.toolbox,
-        rustscan=args.rustscan
+        rustscan=args.rustscan,
+        ai_analyze=args.ai_analyze
     )
     finder.print_banner()
     finder.phone_intelligence()

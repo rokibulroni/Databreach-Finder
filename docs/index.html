@@ -409,6 +409,15 @@
             <p>Dynamically inject ready-to-run terminal commands directly into your CLI based on your target's infrastructure.</p>
             <div class="cmd">--query "target.com" --webcheck --playbook</div>
         </div>
+
+        <div class="card">
+            <div class="icon">
+                <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.4V11h2a2 2 0 0 1 2 2v1h1a2 2 0 0 1 0 4h-1v1a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-1H5a2 2 0 0 1 0-4h1v-1a2 2 0 0 1 2-2h2V9.4A4 4 0 0 1 8 6a4 4 0 0 1 4-4z"></path></svg>
+            </div>
+            <h3>AI Threat Intelligence</h3>
+            <p>Hand off raw OSINT dumps to a local (Ollama, LM Studio) or cloud (OpenAI, Gemini, Anthropic, DeepSeek) LLM to auto-generate a polished analyst report with prioritized risks and mitigation steps.</p>
+            <div class="cmd">--query "example.com" --harvester --spider --ai-analyze</div>
+        </div>
     </div>
 
     <h2 id="commands" style="text-align:center; margin-top:100px; font-size:2.5rem; text-shadow: 0 0 20px var(--border);">A-Z Command Reference</h2>
@@ -423,6 +432,10 @@
             </thead>
             <tbody>
                 <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 15px; white-space: nowrap;"><code>--ai-analyze</code></td>
+                    <td style="padding: 15px; color: var(--text-dim);">AI Threat Intelligence Analysis. Feeds the gathered OSINT dumps to a configured LLM and appends an analyst report (risks + mitigation).</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code>-a, --analyzer</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Perform Social Analyzer permutations and confidence scoring.</td>
                 </tr>
@@ -433,6 +446,10 @@
                 <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code>-c, --config</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Path to custom config file (default: config.json).</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 15px; white-space: nowrap;"><code>--config-ai</code></td>
+                    <td style="padding: 15px; color: var(--text-dim);">Interactive setup wizard for the AI analyst (provider, model, endpoint) with live validation.</td>
                 </tr>
                 <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code>-x, --dossier</code></td>

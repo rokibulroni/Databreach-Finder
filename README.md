@@ -42,6 +42,7 @@
 - **🎯 Advanced Regex Extraction**: Seamlessly carve out IPv4 addresses, Credit Cards, Crypto Wallets (BTC/ETH), AWS Keys, JWTs, and RSA Private Keys from raw data dumps.
 - **🧅 Dark Web / Tor Support**: Route all reconnaissance traffic through the Tor network for absolute anonymity.
 - **📊 Pro-Level HTML Reporting**: Generate stunning, executive-ready HTML reports of all gathered intelligence.
+- **🧠 AI Threat Intelligence Analysis**: Hand off raw OSINT dumps to a Large Language Model (local **Ollama**/**LM Studio** or cloud **OpenAI**, **Gemini**, **Anthropic**, **DeepSeek**) to auto-generate a polished analyst report with prioritized risks and mitigation steps.
 
 ---
 
@@ -84,9 +85,11 @@ Here is a brief, detailed A-Z list of all available commands and flags:
 
 | Command / Flag | Description |
 |---|---|
+| `--ai-analyze` | AI Threat Intelligence Analysis. Feeds the gathered OSINT dumps to a configured LLM and appends an analyst report (risks + mitigation). |
 | `-a, --analyzer` | Perform Social Analyzer permutations and confidence scoring. |
 | `--awesome` | Resource Discovery Engine (Discover Top Curated GitHub Tools). |
 | `-c, --config` | Path to custom config file (default: config.json). |
+| `--config-ai` | Interactive setup wizard for the AI analyst (provider, model, endpoint) with live validation. |
 | `-x, --dossier` | Generate Deep Dossier for username. |
 | `-e, --extract` | Specific data pattern to extract from dumps. Choices: `emails`, `cards`, `ipv4`, `btc`, `eth`, `aws_key`, `jwt`, `rsa_private`. |
 | `--harvester` | Domain Intelligence Engine (Rapid Subdomain and Email Enumeration). |
@@ -137,10 +140,17 @@ Find the best curated tools for a specific attack vector:
 python3 professor_osint.py --query "phishing" --awesome --toolbox
 ```
 
-### The Ultimate Executive Scan
-Run every module and generate a beautiful HTML report:
+### AI Threat Intelligence Analysis
+First configure a provider once (local or cloud), then let the AI turn raw findings into an analyst report:
 ```bash
-python3 professor_osint.py --query "target@gmail.com" --workspace --monitor --webcheck --recommend --playbook --phone --harvester --spider --awesome --toolbox --rustscan --report html
+python3 professor_osint.py --config-ai
+python3 professor_osint.py --query "example.com" --harvester --spider --ai-analyze
+```
+
+### The Ultimate Executive Scan
+Run every module, add AI analysis, and generate a beautiful HTML report:
+```bash
+python3 professor_osint.py --query "target@gmail.com" --workspace --monitor --webcheck --recommend --playbook --phone --harvester --spider --awesome --toolbox --rustscan --ai-analyze --report html
 ```
 
 ---

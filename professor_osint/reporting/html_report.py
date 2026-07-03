@@ -1,3 +1,4 @@
+import html
 import datetime
 import logging
 
@@ -49,6 +50,9 @@ class HtmlReportMixin:
                 .webcheck-item {{ margin-bottom: 8px; }}
                 .webcheck-item strong {{ color: var(--muted); font-weight: 600; }}
                 .tool-card {{ background: var(--panel); border-left: 4px solid var(--accent-2); padding: 12px 16px; margin-bottom: 10px; border-radius: 8px; }}
+                .ai-box {{ background: linear-gradient(135deg, #1a1330 0%, #201a3a 100%); border: 1px solid #6f42c1; border-left: 4px solid #a371f7; border-radius: 12px; padding: 20px 24px; margin-top: 12px; }}
+                .ai-box pre {{ background: transparent; border: none; padding: 0; margin: 0; white-space: pre-wrap; word-wrap: break-word; font-family: inherit; font-size: 0.95rem; line-height: 1.6; color: var(--text); }}
+                .ai-badge {{ display: inline-block; background: #6f42c1; color: #fff; font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 6px; margin-left: 8px; vertical-align: middle; }}
                 pre {{ background: #010409; border: 1px solid var(--border); border-radius: 8px; padding: 12px; overflow-x: auto; }}
                 code {{ font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 0.85rem; }}
                 @media (max-width: 640px) {{
@@ -69,7 +73,16 @@ class HtmlReportMixin:
                 </div>
             </header>
         """
-        
+
+        # AI Threat Intelligence Analysis — rendered prominently at the top as
+        # the executive summary when --ai-analyze produced a report.
+        if getattr(self, 'ai_report', None):
+            ai_html = html.escape(self.ai_report)
+            html_content += f"""
+            <h2>🧠 AI Threat Intelligence Analysis <span class="ai-badge">AI</span></h2>
+            <div class="ai-box"><pre>{ai_html}</pre></div>
+            """
+
         if self.recommended_tools:
             html_content += """
             <h2>💡 Recommended OSINT Arsenal Tools (via API)</h2>
