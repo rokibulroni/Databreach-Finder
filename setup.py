@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -15,12 +15,12 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/rokibul/Databreach-Finder",
-    py_modules=["professor_osint"],
+    packages=find_packages(include=["professor_osint", "professor_osint.*"]),
     install_requires=requirements,
     include_package_data=True,
     entry_points={
         "console_scripts": [
-            "professor-osint=professor_osint:main",
+            "professor-osint=professor_osint.cli:main",
         ],
     },
     classifiers=[

@@ -1,0 +1,78 @@
+import asyncio
+import argparse
+
+from .common import console
+from .constants import PATTERNS
+from .core.finder import ProfessorOSINT
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Professor OSINT [Enterprise OSINT]")
+    parser.add_argument("-q", "--query", help="Target search keyword/query (Domain or Company)")
+    parser.add_argument("-u", "--username", help="Target username to hunt across social media (Social Recon feature)")
+    parser.add_argument("-x", "--dossier", action="store_true", help="Generate Deep Dossier for username")
+    parser.add_argument("-m", "--monitor", action="store_true", help="Global Threat Monitor (Live OSINT News Integration)")
+    parser.add_argument("-w", "--webcheck", action="store_true", help="Live Domain Intelligence (DNS, SSL, Headers)")
+    parser.add_argument("-a", "--analyzer", action="store_true", help="Perform Social Analyzer permutations and confidence scoring")
+    parser.add_argument("--workspace", action="store_true", help="Enterprise Workspace Intelligence (Google Drive, Docs, Trello, Notion)")
+    parser.add_argument("--phone", action="store_true", help="Telecom Intelligence Profile (Carrier, Region, and Footprint Dorking)")
+    parser.add_argument("--harvester", action="store_true", help="Domain Intelligence Engine (Rapid Subdomain and Email Enumeration)")
+    parser.add_argument("--spider", action="store_true", help="Attack Surface Mapping Engine (Ports, CVEs)")
+    parser.add_argument("--awesome", action="store_true", help="Resource Discovery Engine (Discover Top Curated GitHub Tools)")
+    parser.add_argument("--toolbox", action="store_true", help="The Professor's Toolbox (Built-in Installer Menu)")
+    parser.add_argument("--rustscan", action="store_true", help="RustScan Engine (Ultra-Fast Asynchronous Port Scanner)")
+    parser.add_argument("-r", "--recommend", action="store_true", help="Fetch OSINT tool recommendations from your Live API ecosystem")
+    parser.add_argument("-p", "--playbook", action="store_true", help="Fetch ready-to-run Terminal commands for your target")
+    parser.add_argument("-e", "--extract", choices=list(PATTERNS.keys()), help="Specific data pattern to extract from dumps")
+    parser.add_argument("-t", "--threads", type=int, default=10, help="Number of concurrent connections (default: 10)")
+    parser.add_argument("--tor", action="store_true", help="Route traffic through local Tor SOCKS5 proxy (127.0.0.1:9050)")
+    parser.add_argument("--report", choices=['html'], help="Generate a professional HTML report")
+    parser.add_argument("-c", "--config", default="config.json", help="Path to custom config file (default: config.json)")
+    
+    args = parser.parse_args()
+    
+    if not args.query and not args.username:
+        console.print("[bold red][!] You must provide either a --query (-q) or a --username (-u).[/bold red]")
+        return
+
+    finder = ProfessorOSINT(
+        query=args.query,
+        username=args.username,
+        extract_type=args.extract, 
+        threads=args.threads,
+        use_tor=args.tor,
+        report_format=args.report,
+        config_path=args.config,
+        monitor=args.monitor,
+        dossier=args.dossier,
+        webcheck=args.webcheck,
+        recommend=args.recommend,
+        playbook=args.playbook,
+        analyzer=args.analyzer,
+        workspace=args.workspace,
+        phone=args.phone,
+        harvester=args.harvester,
+        spider=args.spider,
+        awesome=args.awesome,
+        toolbox=args.toolbox,
+        rustscan=args.rustscan
+    )
+    finder.print_banner()
+    finder.phone_intelligence()
+    finder.search_toolbox()
+    if finder.harvester:
+        asyncio.run(finder.harvester_search_async())
+    if finder.spider:
+        asyncio.run(finder.spider_search_async())
+    if finder.rustscan:
+        asyncio.run(finder.rustscan_async())
+    if finder.awesome:
+        asyncio.run(finder.awesome_hacking_search_async())
+    finder.dork_search()
+    finder.workspace_search()
+    asyncio.run(finder.process_urls_async())
+    finder.display_results()
+
+
+if __name__ == "__main__":
+    main()

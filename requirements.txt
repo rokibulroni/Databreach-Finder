@@ -4,3 +4,4 @@ googlesearch-python
 rich
 aiohttp
 aiohttp-socks
+python-dotenv

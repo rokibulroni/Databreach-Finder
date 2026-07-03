@@ -26,4 +26,7 @@ jobs:
         pip install -r requirements.txt
     - name: Syntax Check
       run: |
-        python -m py_compile professor_osint.py
+        python -m compileall professor_osint professor_osint.py run.py
+    - name: Import Check
+      run: |
+        python -c "import professor_osint; from professor_osint import ProfessorOSINT, main"
