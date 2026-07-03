@@ -4,10 +4,10 @@ show_spinner() {
     local -r pid="${1}"
     local -r msg="${2:-Working...}"
     local -r delay='0.1'
-    local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+    local spinstr=( '⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏' )
     while kill -0 "${pid}" 2>/dev/null; do
-        for (( i=0; i<${#spinstr}; i++ )); do
-            printf "\r\033[1;36m[%c]\033[0m %s" "${spinstr:$i:1}" "${msg}"
+        for (( i=0; i<${#spinstr[@]}; i++ )); do
+            printf "\r\033[1;36m[%s]\033[0m %s" "${spinstr[$i]}" "${msg}"
             sleep "${delay}"
         done
     done
