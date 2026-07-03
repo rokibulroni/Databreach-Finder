@@ -66,6 +66,33 @@ Search a target company or domain:
 python3 professor_osint.py --query "tesla.com"
 ```
 
+## 📚 A-Z Command Reference
+
+Here is a brief, detailed A-Z list of all available commands and flags:
+
+| Command / Flag | Description |
+|---|---|
+| `-a, --analyzer` | Perform Social Analyzer permutations and confidence scoring. |
+| `--awesome` | Resource Discovery Engine (Discover Top Curated GitHub Tools). |
+| `-c, --config` | Path to custom config file (default: config.json). |
+| `-x, --dossier` | Generate Deep Dossier for username. |
+| `-e, --extract` | Specific data pattern to extract from dumps. |
+| `--harvester` | Domain Intelligence Engine (Rapid Subdomain and Email Enumeration). |
+| `-m, --monitor` | Global Threat Monitor (Live OSINT News Integration). |
+| `--phone` | Telecom Intelligence Profile (Carrier, Region, and Footprint Dorking). |
+| `-p, --playbook` | Fetch ready-to-run Terminal commands for your target. |
+| `-q, --query` | Target search keyword/query (Domain or Company). |
+| `-r, --recommend` | Fetch OSINT tool recommendations from your Live API ecosystem. |
+| `--report` | Generate a professional HTML report. |
+| `--rustscan` | RustScan Engine (Ultra-Fast Asynchronous Port Scanner). |
+| `--spider` | Attack Surface Mapping Engine (Ports, CVEs). |
+| `-t, --threads` | Number of concurrent connections (default: 10). |
+| `--toolbox` | The Professor's Toolbox (Built-in Installer Menu). |
+| `--tor` | Route traffic through local Tor SOCKS5 proxy (127.0.0.1:9050). |
+| `-u, --username` | Target username to hunt across social media (Social Recon feature). |
+| `-w, --webcheck` | Live Domain Intelligence (DNS, SSL, Headers). |
+| `--workspace` | Enterprise Workspace Intelligence (Google Drive, Docs, Trello, Notion). |
+
 ## 🛠️ Module Examples
 
 ### Domain Intelligence & Attack Surface
