@@ -26,6 +26,8 @@ class NetworkConfig(BaseModel):
     proxy_url: Optional[str] = Field(default="")
     wireguard_conf: Optional[str] = Field(default="")
     openvpn_conf: Optional[str] = Field(default="")
+    vpn_username: Optional[str] = Field(default="")
+    vpn_password: Optional[str] = Field(default="")
 
 class ScanConfig(BaseModel):
     query: Optional[str] = Field(default="", description="Target Domain or Company")
@@ -136,8 +138,20 @@ async def update_network_config(config: NetworkConfig):
         try:
             # We kill any existing openvpn processes first (brute force approach for single client use)
             subprocess.run(["killall", "openvpn"], capture_output=True)
+            
+            cmd = ["openvpn", "--config", conf_path, "--daemon"]
+            
+            # Write credentials to auth.txt if provided
+            if config.vpn_username and config.vpn_password:
+                auth_path = os.path.join(POSINT_OPENVPN_DIR, "auth.txt")
+                with open(auth_path, "w") as f:
+                    f.write(f"{config.vpn_username}\n{config.vpn_password}\n")
+                # Secure the auth file
+                os.chmod(auth_path, 0o600)
+                cmd.extend(["--auth-user-pass", auth_path])
+            
             # Run OpenVPN in the background as a daemon
-            res = subprocess.run(["openvpn", "--config", conf_path, "--daemon"], capture_output=True)
+            res = subprocess.run(cmd, capture_output=True)
             if res.returncode != 0:
                 logger.error(f"OpenVPN error: {res.stderr.decode()}")
                 return {"status": "error", "message": f"OpenVPN failed: {res.stderr.decode()}"}

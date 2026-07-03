@@ -523,8 +523,23 @@
             </div>
             
             <div class="form-group" id="fgWg" style="display:none;">
-                <label id="vpnLabel">VPN Configuration (.conf / .ovpn)</label>
+                <label id="vpnLabel" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>VPN Configuration (.conf / .ovpn)</span>
+                    <label for="vpnUpload" style="background:var(--accent); color:#000; padding:2px 8px; border-radius:4px; font-size:0.75rem; cursor:pointer; margin:0;">Browse File</label>
+                    <input type="file" id="vpnUpload" style="display:none;" accept=".conf,.ovpn">
+                </label>
                 <textarea id="netWgConf" placeholder="Paste your VPN config file contents here..."></textarea>
+            </div>
+            
+            <div id="fgVpnAuth" style="display:none; gap:10px; margin-bottom:15px;">
+                <div class="form-group" style="flex:1; margin-bottom:0;">
+                    <label>VPN Username</label>
+                    <input type="text" id="vpnUser" placeholder="Optional">
+                </div>
+                <div class="form-group" style="flex:1; margin-bottom:0;">
+                    <label>VPN Password</label>
+                    <input type="password" id="vpnPass" placeholder="Optional">
+                </div>
             </div>
             
             <div class="modal-buttons">
@@ -670,22 +685,41 @@
             const mode = document.getElementById('netMode').value;
             document.getElementById('fgProxy').style.display = (mode === 'proxy') ? 'block' : 'none';
             document.getElementById('fgWg').style.display = (mode === 'wireguard' || mode === 'openvpn') ? 'block' : 'none';
+            document.getElementById('fgVpnAuth').style.display = (mode === 'openvpn') ? 'flex' : 'none';
             
             if(mode === 'wireguard' || mode === 'openvpn') {
                 document.getElementById('sudoWarning').style.display = 'block';
-                document.getElementById('vpnLabel').innerText = mode === 'openvpn' ? 'OpenVPN Configuration (.ovpn contents)' : 'WireGuard Configuration (.conf contents)';
+                document.getElementById('vpnLabel').children[0].innerText = mode === 'openvpn' ? 'OpenVPN Configuration (.ovpn contents)' : 'WireGuard Configuration (.conf contents)';
             } else {
                 document.getElementById('sudoWarning').style.display = 'none';
             }
         }
+
+        document.getElementById('vpnUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('netWgConf').value = e.target.result;
+            };
+            reader.readAsText(file);
+        });
+
 
         async function saveNetworkConfig() {
             const mode = document.getElementById('netMode').value;
             const proxy_url = document.getElementById('netProxyUrl').value;
             let wireguard_conf = "";
             let openvpn_conf = "";
+            let vpn_username = "";
+            let vpn_password = "";
+            
             if (mode === 'wireguard') wireguard_conf = document.getElementById('netWgConf').value;
-            if (mode === 'openvpn') openvpn_conf = document.getElementById('netWgConf').value;
+            if (mode === 'openvpn') {
+                openvpn_conf = document.getElementById('netWgConf').value;
+                vpn_username = document.getElementById('vpnUser').value;
+                vpn_password = document.getElementById('vpnPass').value;
+            }
             
             document.getElementById('networkText').innerText = "Applying Route...";
             closeNetworkModal();
@@ -694,7 +728,7 @@
                 const res = await fetch('/api/network/config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mode, proxy_url, wireguard_conf, openvpn_conf })
+                    body: JSON.stringify({ mode, proxy_url, wireguard_conf, openvpn_conf, vpn_username, vpn_password })
                 });
                 const data = await res.json();
                 
