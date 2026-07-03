@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Prevent getcwd errors if the user runs this from a deleted directory
+cd "$HOME" || exit 1
+
 show_spinner() {
     local -r pid="${1}"
     local -r msg="${2:-Working...}"
