@@ -695,17 +695,28 @@
                 
                 if (data.status === 'error') {
                     alert(data.message);
-                    term.write(`\r\n\x1b[1;31m[!] ${data.message}\x1b[0m\r\n`);
+                    writeToTerminal(`\r\n\x1b[1;31m[!] ${data.message}\x1b[0m\r\n`);
                     document.getElementById('networkText').innerText = "VPN Failed";
                     return;
                 }
                 
                 currentNetConfig = { mode, proxy_url, wireguard_conf, openvpn_conf };
                 updateNetworkBadge(mode, data.ip_info);
-                term.write(`\r\n\x1b[1;36m[*] Network route successfully updated to ${mode.toUpperCase()} (IP: ${data.ip_info.ip})\x1b[0m\r\n`);
+                writeToTerminal(`\r\n\x1b[1;36m[*] Network route successfully updated to ${mode.toUpperCase()} (IP: ${data.ip_info.ip})\x1b[0m\r\n`);
             } catch (err) {
                 console.error(err);
-                term.write('\r\n\x1b[1;31m[!] Failed to apply network route.\x1b[0m\r\n');
+                writeToTerminal('\r\n\x1b[1;31m[!] Failed to apply network route.\x1b[0m\r\n');
+            }
+        }
+        
+        function writeToTerminal(text) {
+            const terminal = document.getElementById('terminal');
+            if(terminal) {
+                const html = ansiUp.ansi_to_html(text);
+                const div = document.createElement('div');
+                div.innerHTML = html;
+                terminal.appendChild(div);
+                terminal.scrollTop = terminal.scrollHeight;
             }
         }
         
