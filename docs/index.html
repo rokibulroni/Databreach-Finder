@@ -16,6 +16,17 @@
             --text-dim: #a0a8b0;
         }
 
+        :root.light-mode {
+            --bg-color: #f8fafc;
+            --surface: rgba(255, 255, 255, 0.85);
+            --border: rgba(0, 200, 100, 0.3);
+            --primary: #00994d;
+            --primary-glow: rgba(0, 150, 80, 0.2);
+            --secondary: #0066cc;
+            --text-main: #1e293b;
+            --text-dim: #475569;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
@@ -119,7 +130,7 @@
 
         .card h3 {
             margin: 0 0 15px 0;
-            color: white;
+            color: var(--text-main);
             font-size: 1.4rem;
         }
 
@@ -195,9 +206,41 @@
             color: var(--primary);
             text-decoration: none;
         }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            font-size: 1.5rem;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .theme-toggle:hover {
+            box-shadow: 0 0 15px var(--primary-glow);
+            transform: scale(1.1);
+        }
+        
+        :root.light-mode .cmd {
+            background: #e2e8f0;
+            border: 1px solid #cbd5e1;
+            color: #b45309;
+        }
     </style>
 </head>
 <body>
+
+<button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle Light/Dark Mode">☀️</button>
 
 <div class="container">
     <header>
@@ -311,79 +354,79 @@
                 </tr>
             </thead>
             <tbody>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">-a, --analyzer</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Perform Social Analyzer permutations and confidence scoring.</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">--awesome</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Resource Discovery Engine (Discover Top Curated GitHub Tools).</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">-c, --config</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Path to custom config file (default: config.json).</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">-x, --dossier</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Generate Deep Dossier for username.</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">-e, --extract</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Specific data pattern to extract from dumps.</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">--harvester</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Domain Intelligence Engine (Rapid Subdomain and Email Enumeration).</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">-m, --monitor</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Global Threat Monitor (Live OSINT News Integration).</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">--phone</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Telecom Intelligence Profile (Carrier, Region, and Footprint Dorking).</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">-p, --playbook</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Fetch ready-to-run Terminal commands for your target.</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">-q, --query</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Target search keyword/query (Domain or Company).</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">-r, --recommend</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Fetch OSINT tool recommendations from your Live API ecosystem.</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">--report</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Generate a professional HTML report.</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">--rustscan</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">RustScan Engine (Ultra-Fast Asynchronous Port Scanner).</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">--spider</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Attack Surface Mapping Engine (Ports, CVEs).</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">-t, --threads</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Number of concurrent connections (default: 10).</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">--toolbox</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">The Professor's Toolbox (Built-in Installer Menu).</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">--tor</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Route traffic through local Tor SOCKS5 proxy (127.0.0.1:9050).</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">-u, --username</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Target username to hunt across social media (Social Recon feature).</td>
                 </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid var(--border);">
                     <td style="padding: 15px; white-space: nowrap;"><code style="color: #ff9d00;">-w, --webcheck</code></td>
                     <td style="padding: 15px; color: var(--text-dim);">Live Domain Intelligence (DNS, SSL, Headers).</td>
                 </tr>
@@ -401,5 +444,24 @@
     </footer>
 </div>
 
+<script>
+    function toggleTheme() {
+        document.documentElement.classList.toggle('light-mode');
+        const btn = document.getElementById('themeToggleBtn');
+        if (document.documentElement.classList.contains('light-mode')) {
+            localStorage.setItem('theme', 'light');
+            btn.innerHTML = '🌙';
+        } else {
+            localStorage.setItem('theme', 'dark');
+            btn.innerHTML = '☀️';
+        }
+    }
+
+    // Load saved theme or system preference
+    if (localStorage.getItem('theme') === 'light' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+        document.documentElement.classList.add('light-mode');
+        document.getElementById('themeToggleBtn').innerHTML = '🌙';
+    }
+</script>
 </body>
 </html>
